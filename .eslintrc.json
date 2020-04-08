@@ -2,6 +2,13 @@
   "extends": "airbnb",
   "rules": {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "implicit-arrow-linebreak": 1
+    "react/no-unused-state": 1,
+    "implicit-arrow-linebreak": 1,
+    "no-unused-vars": 1,
+    "global-require": 1,
+    "import/no-dynamic-require": 1,
+    "jsx-a11y/alt-text": 1,
+    "class-methods-use-this": 1,
+    "prefer-const": 1
   }
 }
