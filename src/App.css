@@ -10,12 +10,14 @@
   font-size: 30px;
   text-align: center;
   white-space: nowrap;
+  border-bottom: 2px solid black;
 }
 
 .GameBoard {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .Assets {
@@ -24,6 +26,11 @@
   flex-direction: column;
   border-left: 2px solid black;
   border-right: 2px solid black;
+}
+
+.AssetScroller {
+  overflow: scroll;
+  height: 70vh;
 }
 
 .SelectedAsset,
@@ -42,6 +49,12 @@
   padding-right: 10px;
 }
 
+.AssetBoard-category {
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid grey;
+}
+
 Button {
   margin-top: 10px;
   font-family: RetroGame;
@@ -50,4 +63,9 @@ Button {
 img {
   width: 64px;
   height: 64px;
+}
+
+h3 {
+  font-size: 14px;
+  color: grey;
 }

@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
-import TILES from './tiles';
+import { BACKGROUND_TILES, ITEM_TILES, HOME_TILES, WALL_TILES } from './tiles';
 
 const assetBoardCol = 4;
 
@@ -15,8 +15,11 @@ class App extends React.Component {
       boardRows: 14,
       boardCols: 20,
       board: [],
-      selectedAsset: TILES[0],
+      selectedAsset: BACKGROUND_TILES[0],
       assetBoardBackground: [],
+      assetBoardItem: [],
+      assetBoardHome: [],
+      assetBoardWall: [],
     };
   }
 
@@ -25,8 +28,16 @@ class App extends React.Component {
     // Initialize board
     this.resetBoard();
     // Initialize assets
-    let assetBoardBackground = this.initializeAsset(TILES);
-    this.setState({ assetBoardBackground });
+    let assetBoardBackground = this.initializeAsset(BACKGROUND_TILES);
+    let assetBoardItem = this.initializeAsset(ITEM_TILES);
+    let assetBoardHome = this.initializeAsset(HOME_TILES);
+    let assetBoardWall = this.initializeAsset(WALL_TILES);
+    this.setState({
+      assetBoardBackground,
+      assetBoardItem,
+      assetBoardHome,
+      assetBoardWall,
+    });
   }
 
   initializeAsset(assetList) {
@@ -99,9 +110,10 @@ class App extends React.Component {
   }
 
   // Helper to render asset board
-  renderAssetBoard(assetBoard) {
+  renderAssetBoard(assetBoard, categoryName) {
     return (
-      <div className="AssetBoard-Category">
+      <div className="AssetBoard-category">
+        <h3>{categoryName}</h3>
         {assetBoard.map((val, ind, assetList) => (
           <div className="AssetBoard-row">{this.renderAssetRow(val, ind, assetList)}</div>
         ))}
@@ -110,7 +122,13 @@ class App extends React.Component {
   }
 
   render() {
-    const { selectedAsset, assetBoardBackground } = this.state;
+    const {
+      selectedAsset,
+      assetBoardBackground,
+      assetBoardItem,
+      assetBoardHome,
+      assetBoardWall,
+    } = this.state;
     return (
       <div className="App">
         <div className="GameBoard">
@@ -120,7 +138,12 @@ class App extends React.Component {
         <div className="Assets">
           <div className="AssetBoard">
             <h>ASSETBOARD</h>
-            {this.renderAssetBoard(assetBoardBackground)}
+            <div className="AssetScroller">
+              {this.renderAssetBoard(assetBoardBackground, 'Background')}
+              {this.renderAssetBoard(assetBoardItem, 'Item')}
+              {this.renderAssetBoard(assetBoardHome, 'Home')}
+              {this.renderAssetBoard(assetBoardWall, 'Wall')}
+            </div>
           </div>
 
           <div className="SelectedAsset">
