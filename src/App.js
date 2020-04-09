@@ -17,10 +17,12 @@ class App extends React.Component {
       board: [],
       selectedAsset: 'background/ground_64.png',
       selectedAssetIsBackground: true,
+      selectedAssetFlipStatus: 1, // 1: normal ; -1: flipped horizontally
       assetBoardBackground: [],
       assetBoardItem: [],
       assetBoardHome: [],
       assetBoardWall: [],
+      flipAssetIndicator: [],
     };
   }
 
@@ -42,7 +44,7 @@ class App extends React.Component {
   }
 
   initializeAsset(assetDict) {
-    const newBoard = [];
+    let newBoard = [];
     const assetList = Object.keys(assetDict);
     while (assetList.length !== 0) {
       newBoard.push(assetList.splice(0, assetBoardCol));
@@ -53,20 +55,30 @@ class App extends React.Component {
   // Clear entire game board
   resetBoard() {
     const { boardRows, boardCols, selectedAsset } = this.state;
-    const newBoard = [];
+    let board = [];
+    let flipAssetIndicator = [];
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
+      let newFlipRow = [];
       for (let j = 0; j < boardCols; j++) {
         newRow.push([selectedAsset]);
+        newFlipRow.push(1);
       }
-      newBoard.push(newRow);
+      board.push(newRow);
+      flipAssetIndicator.push(newFlipRow);
     }
-    this.setState({ board: newBoard });
+    this.setState({ board, flipAssetIndicator });
   }
 
   // Change selected square in game board to display selected asset
   handleGameSquareClick(rowInd, colInd) {
-    let { board, selectedAsset, selectedAssetIsBackground } = this.state;
+    let {
+      board,
+      selectedAsset,
+      selectedAssetIsBackground,
+      selectedAssetFlipStatus,
+      flipAssetIndicator,
+    } = this.state;
     if (selectedAssetIsBackground) {
       board[rowInd][colInd] = [selectedAsset];
     } else {
@@ -75,11 +87,13 @@ class App extends React.Component {
       }
       board[rowInd][colInd].push(selectedAsset);
     }
-    this.setState({ board });
+    flipAssetIndicator[rowInd][colInd] = selectedAssetFlipStatus;
+    this.setState({ board, flipAssetIndicator });
   }
 
   // Helper to render game board's individual rows
   renderGameRow(row, rowInd) {
+    const { flipAssetIndicator } = this.state;
     return row.map((path, colInd) => {
       if (path.length === 1) {
         return (
@@ -106,6 +120,7 @@ class App extends React.Component {
             row={rowInd}
             col={colInd}
             src={require(`./assets/${path[1]}`)}
+            style={{ transform: `scaleX(${flipAssetIndicator[rowInd][colInd]})` }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
         </div>
@@ -158,9 +173,15 @@ class App extends React.Component {
     );
   }
 
+  flipAsset() {
+    const { selectedAssetFlipStatus } = this.state;
+    this.setState({ selectedAssetFlipStatus: -selectedAssetFlipStatus });
+  }
+
   render() {
     const {
       selectedAsset,
+      selectedAssetFlipStatus,
       assetBoardBackground,
       assetBoardItem,
       assetBoardHome,
@@ -186,11 +207,19 @@ class App extends React.Component {
           <div className="SelectedAsset">
             <h>SELECTED ASSET</h>
             <br />
-            <img className="SelectedAssetImg" src={require(`./assets/${selectedAsset}`)} />
+            <img
+              className="SelectedAssetImg"
+              style={{ transform: `scaleX(${selectedAssetFlipStatus})` }}
+              src={require(`./assets/${selectedAsset}`)}
+            />
+            <br />
+            <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
+              Flip
+            </Button>
           </div>
 
           <div className="ResetButton">
-            <Button outline color="info" type="button" onClick={() => this.resetBoard()}>
+            <Button outline color="danger" type="button" onClick={() => this.resetBoard()}>
               Reset
             </Button>
           </div>

@@ -40,6 +40,10 @@
   height: 70vh;
 }
 
+.SelectedAssetImg {
+  margin-top: 10px;
+}
+
 .SelectedAsset,
 .ResetButton {
   margin-top: 5px;
@@ -68,6 +72,7 @@
 
 Button {
   margin-top: 10px;
+  margin-bottom: 10px;
   font-family: RetroGame;
 }
 
