@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
-import FLOOR_TILES from './tiles';
+import TILES from './tiles';
 
 const assetBoardCol = 4;
 
@@ -15,8 +15,8 @@ class App extends React.Component {
       boardRows: 14,
       boardCols: 20,
       board: [],
-      selectedAsset: FLOOR_TILES[0],
-      assetBoardFloor: [],
+      selectedAsset: TILES[0],
+      assetBoardBackground: [],
     };
   }
 
@@ -25,8 +25,8 @@ class App extends React.Component {
     // Initialize board
     this.resetBoard();
     // Initialize assets
-    let assetBoardFloor = this.initializeAsset(FLOOR_TILES);
-    this.setState({ assetBoardFloor });
+    let assetBoardBackground = this.initializeAsset(TILES);
+    this.setState({ assetBoardBackground });
   }
 
   initializeAsset(assetList) {
@@ -110,7 +110,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { selectedAsset, assetBoardFloor } = this.state;
+    const { selectedAsset, assetBoardBackground } = this.state;
     return (
       <div className="App">
         <div className="GameBoard">
@@ -120,7 +120,7 @@ class App extends React.Component {
         <div className="Assets">
           <div className="AssetBoard">
             <h>ASSETBOARD</h>
-            {this.renderAssetBoard(assetBoardFloor)}
+            {this.renderAssetBoard(assetBoardBackground)}
           </div>
 
           <div className="SelectedAsset">

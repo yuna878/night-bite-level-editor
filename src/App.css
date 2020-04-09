@@ -46,3 +46,8 @@ Button {
   margin-top: 10px;
   font-family: RetroGame;
 }
+
+img {
+  width: 64px;
+  height: 64px;
+}
