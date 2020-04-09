@@ -15,7 +15,8 @@ class App extends React.Component {
       boardRows: 14,
       boardCols: 20,
       board: [],
-      selectedAsset: BACKGROUND_TILES[0],
+      selectedAsset: 'background/ground_64.png',
+      selectedAssetIsBackground: true,
       assetBoardBackground: [],
       assetBoardItem: [],
       assetBoardHome: [],
@@ -40,8 +41,9 @@ class App extends React.Component {
     });
   }
 
-  initializeAsset(assetList) {
+  initializeAsset(assetDict) {
     const newBoard = [];
+    const assetList = Object.keys(assetDict);
     while (assetList.length !== 0) {
       newBoard.push(assetList.splice(0, assetBoardCol));
     }
@@ -55,7 +57,7 @@ class App extends React.Component {
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
       for (let j = 0; j < boardCols; j++) {
-        newRow.push(selectedAsset);
+        newRow.push([selectedAsset]);
       }
       newBoard.push(newRow);
     }
@@ -64,22 +66,51 @@ class App extends React.Component {
 
   // Change selected square in game board to display selected asset
   handleGameSquareClick(rowInd, colInd) {
-    let { board, selectedAsset } = this.state;
-    board[rowInd][colInd] = selectedAsset;
+    let { board, selectedAsset, selectedAssetIsBackground } = this.state;
+    if (selectedAssetIsBackground) {
+      board[rowInd][colInd] = [selectedAsset];
+    } else {
+      if (board[rowInd][colInd].length !== 1) {
+        board[rowInd][colInd].pop();
+      }
+      board[rowInd][colInd].push(selectedAsset);
+    }
     this.setState({ board });
   }
 
   // Helper to render game board's individual rows
   renderGameRow(row, rowInd) {
-    return row.map((path, colInd) => (
-      <img
-        className="GameBoard-Square"
-        row={rowInd}
-        col={colInd}
-        src={require(`./assets/${path}`)}
-        onClick={() => this.handleGameSquareClick(rowInd, colInd)}
-      />
-    ));
+    return row.map((path, colInd) => {
+      if (path.length === 1) {
+        return (
+          <img
+            className="GameBoard-square"
+            row={rowInd}
+            col={colInd}
+            src={require(`./assets/${path[0]}`)}
+            onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+          />
+        );
+      }
+      return (
+        <div className="GameBoard-square">
+          <img
+            className="image1"
+            row={rowInd}
+            col={colInd}
+            src={require(`./assets/${path[0]}`)}
+            onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+          />
+          <img
+            className="image2"
+            row={rowInd}
+            col={colInd}
+            src={require(`./assets/${path[1]}`)}
+            onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+          />
+        </div>
+      );
+    });
   }
 
   // Helper to render game board
@@ -92,15 +123,21 @@ class App extends React.Component {
 
   // Change selected asset
   handleAssetSquareClick(rowInd, colInd, assetList) {
+    let { assetBoardBackground, selectedAssetIsBackground } = this.state;
     let selectedAsset = assetList[rowInd][colInd];
-    this.setState({ selectedAsset });
+    if (assetList === assetBoardBackground) {
+      selectedAssetIsBackground = true;
+    } else {
+      selectedAssetIsBackground = false;
+    }
+    this.setState({ selectedAsset, selectedAssetIsBackground });
   }
 
   // Helper to render asset board's individual rows
   renderAssetRow(row, rowInd, assetList) {
     return row.map((path, colInd) => (
       <img
-        className="AssetBoard-Square"
+        className="AssetBoard-square"
         row={rowInd}
         col={colInd}
         src={require(`./assets/${path}`)}

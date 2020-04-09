@@ -10,14 +10,14 @@
   font-size: 30px;
   text-align: center;
   white-space: nowrap;
-  border-bottom: 2px solid black;
 }
 
 .GameBoard {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid black;
 }
 
 .Assets {
@@ -26,6 +26,13 @@
   flex-direction: column;
   border-left: 2px solid black;
   border-right: 2px solid black;
+  border-bottom: 2px solid black;
+}
+.image1 {
+  position: absolute;
+}
+.image2 {
+  position: relative;
 }
 
 .AssetScroller {
@@ -47,6 +54,10 @@
   display: flex;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.AssetBoard-square {
+  border: 1px solid white;
 }
 
 .AssetBoard-category {
