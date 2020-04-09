@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 import React from 'react';
 import './App.css';
-import FLOOR_TILES from './tiles';
+import TILES from './tiles';
 
 const assetBoardCol = 3;
 
@@ -13,8 +13,8 @@ class App extends React.Component {
       boardRows: 5,
       boardCols: 5,
       board: [],
-      selectedAsset: FLOOR_TILES[0],
-      assetBoardFloor: [],
+      selectedAsset: TILES[0],
+      assetBoardBackground: [],
     };
   }
 
@@ -24,13 +24,13 @@ class App extends React.Component {
     this.resetBoard();
 
     // Initialize assets
-    let assetBoardFloor = this.initializeAsset(FLOOR_TILES);
-    this.setState({ assetBoardFloor });
+    let assetBoardBackground = this.initializeAsset(TILES);
+    this.setState({ assetBoardBackground });
   }
 
   initializeAsset(assetList) {
     const newBoard = [];
-    while (assetList.length != 0) {
+    while (assetList.length !== 0) {
       newBoard.push(assetList.splice(0, assetBoardCol));
     }
     return newBoard;
@@ -109,7 +109,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { selectedAsset, assetBoardFloor } = this.state;
+    const { selectedAsset, assetBoardBackground } = this.state;
     return (
       <div className="App">
         <h>GAMEBOARD</h>
@@ -121,7 +121,7 @@ class App extends React.Component {
         </div>
 
         <h>ASSETBOARD</h>
-        <div className="AssetBoard">{this.renderAssetBoard(assetBoardFloor)}</div>
+        <div className="AssetBoard">{this.renderAssetBoard(assetBoardBackground)}</div>
 
         <button type="button" onClick={() => this.resetBoard()}>
           Reset
