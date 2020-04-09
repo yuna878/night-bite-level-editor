@@ -1,3 +1,48 @@
+@font-face {
+  font-family: RetroGame;
+  src: url(./assets/RetroGame.ttf);
+}
+
 .App {
+  display: flex;
+  flex-direction: row;
+  font-family: RetroGame;
+  font-size: 30px;
   text-align: center;
+  white-space: nowrap;
+}
+
+.GameBoard {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.Assets {
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+}
+
+.SelectedAsset,
+.ResetButton {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 2px solid black;
+}
+
+.GameBoard-row,
+.AssetBoard-row {
+  margin: 0;
+  line-height: 0px;
+  display: flex;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+Button {
+  margin-top: 10px;
+  font-family: RetroGame;
 }

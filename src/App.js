@@ -1,17 +1,19 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-plusplus */
 import React from 'react';
+import { Button } from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 import FLOOR_TILES from './tiles';
 
-const assetBoardCol = 3;
+const assetBoardCol = 4;
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      boardRows: 5,
-      boardCols: 5,
+      boardRows: 14,
+      boardCols: 20,
       board: [],
       selectedAsset: FLOOR_TILES[0],
       assetBoardFloor: [],
@@ -22,7 +24,6 @@ class App extends React.Component {
   componentDidMount() {
     // Initialize board
     this.resetBoard();
-
     // Initialize assets
     let assetBoardFloor = this.initializeAsset(FLOOR_TILES);
     this.setState({ assetBoardFloor });
@@ -30,7 +31,7 @@ class App extends React.Component {
 
   initializeAsset(assetList) {
     const newBoard = [];
-    while (assetList.length != 0) {
+    while (assetList.length !== 0) {
       newBoard.push(assetList.splice(0, assetBoardCol));
     }
     return newBoard;
@@ -112,20 +113,28 @@ class App extends React.Component {
     const { selectedAsset, assetBoardFloor } = this.state;
     return (
       <div className="App">
-        <h>GAMEBOARD</h>
-        <div className="GameBoard">{this.renderGameBoard()}</div>
-
-        <h>SELECTED ASSET</h>
-        <div className="SelectedAsset">
-          <img className="SelectedAsset" src={require(`./assets/${selectedAsset}`)} />
+        <div className="GameBoard">
+          <h>GAMEBOARD</h>
+          {this.renderGameBoard()}
         </div>
+        <div className="Assets">
+          <div className="AssetBoard">
+            <h>ASSETBOARD</h>
+            {this.renderAssetBoard(assetBoardFloor)}
+          </div>
 
-        <h>ASSETBOARD</h>
-        <div className="AssetBoard">{this.renderAssetBoard(assetBoardFloor)}</div>
+          <div className="SelectedAsset">
+            <h>SELECTED ASSET</h>
+            <br />
+            <img className="SelectedAssetImg" src={require(`./assets/${selectedAsset}`)} />
+          </div>
 
-        <button type="button" onClick={() => this.resetBoard()}>
-          Reset
-        </button>
+          <div className="ResetButton">
+            <Button outline color="info" type="button" onClick={() => this.resetBoard()}>
+              Reset
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
