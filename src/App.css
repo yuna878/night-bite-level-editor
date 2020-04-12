@@ -41,7 +41,8 @@
 }
 
 .SelectedAssetImg {
-  margin-top: 10px;
+  width: 64px;
+  height: 64px;
 }
 
 .SelectedAsset,
@@ -60,8 +61,15 @@
   padding-right: 10px;
 }
 
+.GameBoard-square {
+  width: 50px;
+  height: 50px;
+}
+
 .AssetBoard-square {
   border: 1px solid white;
+  width: 64px;
+  height: 64px;
 }
 
 .AssetBoard-category {
@@ -77,8 +85,8 @@ Button {
 }
 
 img {
-  width: 64px;
-  height: 64px;
+  width: inherit;
+  height: inherit;
 }
 
 h3 {

@@ -12,17 +12,19 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      boardRows: 14,
-      boardCols: 20,
+      boardRows: 12,
+      boardCols: 25,
       board: [],
       selectedAsset: 'background/ground_64.png',
       selectedAssetIsBackground: true,
       selectedAssetFlipStatus: 1, // 1: normal ; -1: flipped horizontally
+      selectedAssetRotateStatus: 0, // Degrees
       assetBoardBackground: [],
       assetBoardItem: [],
       assetBoardHome: [],
       assetBoardWall: [],
       flipAssetIndicator: [],
+      rotateAssetIndicator: [],
     };
   }
 
@@ -57,17 +59,21 @@ class App extends React.Component {
     const { boardRows, boardCols, selectedAsset } = this.state;
     let board = [];
     let flipAssetIndicator = [];
+    let rotateAssetIndicator = [];
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
       let newFlipRow = [];
+      let newRotateRow = [];
       for (let j = 0; j < boardCols; j++) {
         newRow.push([selectedAsset]);
-        newFlipRow.push(1);
+        newFlipRow.push([1]);
+        newRotateRow.push([0]);
       }
       board.push(newRow);
       flipAssetIndicator.push(newFlipRow);
+      rotateAssetIndicator.push(newRotateRow);
     }
-    this.setState({ board, flipAssetIndicator });
+    this.setState({ board, flipAssetIndicator, rotateAssetIndicator });
   }
 
   // Change selected square in game board to display selected asset
@@ -77,35 +83,48 @@ class App extends React.Component {
       selectedAsset,
       selectedAssetIsBackground,
       selectedAssetFlipStatus,
+      selectedAssetRotateStatus,
       flipAssetIndicator,
+      rotateAssetIndicator,
     } = this.state;
     if (selectedAssetIsBackground) {
       board[rowInd][colInd] = [selectedAsset];
+      flipAssetIndicator[rowInd][colInd] = selectedAssetFlipStatus;
+      rotateAssetIndicator[rowInd][colInd] = selectedAssetRotateStatus;
     } else {
       if (board[rowInd][colInd].length !== 1) {
         board[rowInd][colInd].pop();
+        flipAssetIndicator[rowInd][colInd].pop();
+        rotateAssetIndicator[rowInd][colInd].pop();
       }
       board[rowInd][colInd].push(selectedAsset);
+      flipAssetIndicator[rowInd][colInd].push(selectedAssetFlipStatus);
+      rotateAssetIndicator[rowInd][colInd].push(selectedAssetRotateStatus);
     }
-    flipAssetIndicator[rowInd][colInd] = selectedAssetFlipStatus;
-    this.setState({ board, flipAssetIndicator });
+    this.setState({ board, flipAssetIndicator, rotateAssetIndicator });
   }
 
   // Helper to render game board's individual rows
   renderGameRow(row, rowInd) {
-    const { flipAssetIndicator } = this.state;
+    const { flipAssetIndicator, rotateAssetIndicator } = this.state;
     return row.map((path, colInd) => {
+      // Background tile only
       if (path.length === 1) {
         return (
-          <img
-            className="GameBoard-square"
-            row={rowInd}
-            col={colInd}
-            src={require(`./assets/${path[0]}`)}
-            onClick={() => this.handleGameSquareClick(rowInd, colInd)}
-          />
+          <div className="GameBoard-square">
+            <img
+              row={rowInd}
+              col={colInd}
+              src={require(`./assets/${path[0]}`)}
+              style={{
+                transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]})`,
+              }}
+              onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+            />
+          </div>
         );
       }
+      // Background + overlay
       return (
         <div className="GameBoard-square">
           <img
@@ -113,6 +132,9 @@ class App extends React.Component {
             row={rowInd}
             col={colInd}
             src={require(`./assets/${path[0]}`)}
+            style={{
+              transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]}deg)`,
+            }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
           <img
@@ -120,7 +142,9 @@ class App extends React.Component {
             row={rowInd}
             col={colInd}
             src={require(`./assets/${path[1]}`)}
-            style={{ transform: `scaleX(${flipAssetIndicator[rowInd][colInd]})` }}
+            style={{
+              transform: `scaleX(${flipAssetIndicator[rowInd][colInd][1]}) rotate(${rotateAssetIndicator[rowInd][colInd][1]}deg)`,
+            }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
         </div>
@@ -145,7 +169,12 @@ class App extends React.Component {
     } else {
       selectedAssetIsBackground = false;
     }
-    this.setState({ selectedAsset, selectedAssetIsBackground });
+    this.setState({
+      selectedAsset,
+      selectedAssetIsBackground,
+      selectedAssetFlipStatus: 1,
+      selectedAssetRotateStatus: 0,
+    });
   }
 
   // Helper to render asset board's individual rows
@@ -173,20 +202,33 @@ class App extends React.Component {
     );
   }
 
+  // Helper to render selected asset
+  renderSelectedAsset() {
+    const { selectedAsset, selectedAssetFlipStatus, selectedAssetRotateStatus } = this.state;
+    return (
+      <img
+        className="SelectedAssetImg"
+        style={{
+          transform: `scaleX(${selectedAssetFlipStatus}) rotate(${selectedAssetRotateStatus}deg)`,
+        }}
+        src={require(`./assets/${selectedAsset}`)}
+      />
+    );
+  }
+
   flipAsset() {
     const { selectedAssetFlipStatus } = this.state;
     this.setState({ selectedAssetFlipStatus: -selectedAssetFlipStatus });
   }
 
+  rotateAsset() {
+    let { selectedAssetRotateStatus } = this.state;
+    selectedAssetRotateStatus += 90 % 360; // Rotate 90 degrees clockwise
+    this.setState({ selectedAssetRotateStatus });
+  }
+
   render() {
-    const {
-      selectedAsset,
-      selectedAssetFlipStatus,
-      assetBoardBackground,
-      assetBoardItem,
-      assetBoardHome,
-      assetBoardWall,
-    } = this.state;
+    const { assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall } = this.state;
     return (
       <div className="App">
         <div className="GameBoard">
@@ -200,21 +242,20 @@ class App extends React.Component {
               {this.renderAssetBoard(assetBoardBackground, 'Background')}
               {this.renderAssetBoard(assetBoardItem, 'Item')}
               {this.renderAssetBoard(assetBoardHome, 'Home')}
-              {this.renderAssetBoard(assetBoardWall, 'Wall')}
+              {this.renderAssetBoard(assetBoardWall, 'Environment')}
             </div>
           </div>
 
           <div className="SelectedAsset">
             <h>SELECTED ASSET</h>
             <br />
-            <img
-              className="SelectedAssetImg"
-              style={{ transform: `scaleX(${selectedAssetFlipStatus})` }}
-              src={require(`./assets/${selectedAsset}`)}
-            />
+            {this.renderSelectedAsset()}
             <br />
             <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
               Flip
+            </Button>{' '}
+            <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
+              Rotate
             </Button>
           </div>
 
