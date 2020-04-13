@@ -4,9 +4,17 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
-import { BACKGROUND_TILES, ITEM_TILES, HOME_TILES, WALL_TILES } from './tiles';
+import {
+  BACKGROUND_TILES,
+  ITEM_TILES,
+  HOME_TILES,
+  WALL_TILES,
+  COMBINED_TILES,
+  TILE_TYPE,
+} from './tiles';
 
-const assetBoardCol = 4;
+const ASSETBOARD_COLS = 4;
+const GAMESQUARE_SIZE = 50;
 
 class App extends React.Component {
   constructor(props) {
@@ -14,17 +22,19 @@ class App extends React.Component {
     this.state = {
       boardRows: 12,
       boardCols: 25,
-      board: [],
+      board: [], // 2d array where each element is an array strings of path to asset
       selectedAsset: 'background/ground_64.png',
       selectedAssetIsBackground: true,
       selectedAssetFlipStatus: 1, // 1: normal ; -1: flipped horizontally
       selectedAssetRotateStatus: 0, // Degrees
+      selectedAssetSizeRatio: 1,
       assetBoardBackground: [],
       assetBoardItem: [],
       assetBoardHome: [],
       assetBoardWall: [],
-      flipAssetIndicator: [],
-      rotateAssetIndicator: [],
+      flipAssetIndicator: [], // 2d array where each element is an array of ints indicating flip status
+      rotateAssetIndicator: [], // 2d array where each element is array of ints indicating degree of rotation
+      largeAssetIndicator: [], // 2d array where each element is null or [size, x_coord, y_coord] for top-most image
     };
   }
 
@@ -49,65 +59,111 @@ class App extends React.Component {
     let newBoard = [];
     const assetList = Object.keys(assetDict);
     while (assetList.length !== 0) {
-      newBoard.push(assetList.splice(0, assetBoardCol));
+      newBoard.push(assetList.splice(0, ASSETBOARD_COLS));
     }
     return newBoard;
   }
 
   // Clear entire game board
   resetBoard() {
-    const { boardRows, boardCols, selectedAsset } = this.state;
+    const {
+      boardRows,
+      boardCols,
+      selectedAsset,
+      selectedAssetFlipStatus,
+      selectedAssetRotateStatus,
+    } = this.state;
     let board = [];
     let flipAssetIndicator = [];
     let rotateAssetIndicator = [];
+    let largeAssetIndicator = [];
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
       let newFlipRow = [];
       let newRotateRow = [];
+      let newLargeRow = [];
       for (let j = 0; j < boardCols; j++) {
         newRow.push([selectedAsset]);
-        newFlipRow.push([1]);
-        newRotateRow.push([0]);
+        newFlipRow.push([selectedAssetFlipStatus]);
+        newRotateRow.push([selectedAssetRotateStatus]);
+        newLargeRow.push(null);
       }
       board.push(newRow);
       flipAssetIndicator.push(newFlipRow);
       rotateAssetIndicator.push(newRotateRow);
+      largeAssetIndicator.push(newLargeRow);
     }
-    this.setState({ board, flipAssetIndicator, rotateAssetIndicator });
+    this.setState({
+      board,
+      flipAssetIndicator,
+      rotateAssetIndicator,
+      largeAssetIndicator,
+    });
   }
 
   // Change selected square in game board to display selected asset
   handleGameSquareClick(rowInd, colInd) {
     let {
       board,
+      boardRows,
+      boardCols,
       selectedAsset,
       selectedAssetIsBackground,
       selectedAssetFlipStatus,
       selectedAssetRotateStatus,
+      selectedAssetSizeRatio,
       flipAssetIndicator,
       rotateAssetIndicator,
+      largeAssetIndicator,
     } = this.state;
-    if (selectedAssetIsBackground) {
-      board[rowInd][colInd] = [selectedAsset];
-      flipAssetIndicator[rowInd][colInd] = selectedAssetFlipStatus;
-      rotateAssetIndicator[rowInd][colInd] = selectedAssetRotateStatus;
-    } else {
-      if (board[rowInd][colInd].length !== 1) {
-        board[rowInd][colInd].pop();
-        flipAssetIndicator[rowInd][colInd].pop();
-        rotateAssetIndicator[rowInd][colInd].pop();
+
+    for (let i = 0; i < selectedAssetSizeRatio; i++) {
+      for (let j = 0; j < selectedAssetSizeRatio; j++) {
+        let x = rowInd + i;
+        let y = colInd + j;
+        if (x < boardRows && y < boardCols) {
+          largeAssetIndicator[x][y] = [selectedAssetSizeRatio, i, j];
+          if (selectedAssetIsBackground) {
+            board[x][y] = [selectedAsset];
+            flipAssetIndicator[x][y] = [selectedAssetFlipStatus];
+            rotateAssetIndicator[x][y] = [selectedAssetRotateStatus];
+          } else {
+            if (board[x][y].length !== 1) {
+              board[x][y].pop();
+              flipAssetIndicator[x][y].pop();
+              rotateAssetIndicator[x][y].pop();
+            }
+            board[x][y].push(selectedAsset);
+            flipAssetIndicator[x][y].push(selectedAssetFlipStatus);
+            rotateAssetIndicator[x][y].push(selectedAssetRotateStatus);
+          }
+        }
       }
-      board[rowInd][colInd].push(selectedAsset);
-      flipAssetIndicator[rowInd][colInd].push(selectedAssetFlipStatus);
-      rotateAssetIndicator[rowInd][colInd].push(selectedAssetRotateStatus);
     }
-    this.setState({ board, flipAssetIndicator, rotateAssetIndicator });
+    this.setState({
+      board,
+      flipAssetIndicator,
+      rotateAssetIndicator,
+      largeAssetIndicator,
+    });
+  }
+
+  generateMargin(assetInfo) {
+    const x = assetInfo[1];
+    const y = assetInfo[2];
+    return `${-GAMESQUARE_SIZE * x}px 0px 0px ${-GAMESQUARE_SIZE * y}px`;
   }
 
   // Helper to render game board's individual rows
   renderGameRow(row, rowInd) {
-    const { flipAssetIndicator, rotateAssetIndicator } = this.state;
+    const { flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = this.state;
+
     return row.map((path, colInd) => {
+      const largeAsset = largeAssetIndicator[rowInd][colInd]
+        ? largeAssetIndicator[rowInd][colInd]
+        : false;
+      const largeAssetSize = largeAsset[0] * GAMESQUARE_SIZE;
+
       // Background tile only
       if (path.length === 1) {
         return (
@@ -117,7 +173,7 @@ class App extends React.Component {
               col={colInd}
               src={require(`./assets/${path[0]}`)}
               style={{
-                transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]})`,
+                transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]}deg)`,
               }}
               onClick={() => this.handleGameSquareClick(rowInd, colInd)}
             />
@@ -144,6 +200,9 @@ class App extends React.Component {
             src={require(`./assets/${path[1]}`)}
             style={{
               transform: `scaleX(${flipAssetIndicator[rowInd][colInd][1]}) rotate(${rotateAssetIndicator[rowInd][colInd][1]}deg)`,
+              height: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
+              width: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
+              margin: `${largeAsset ? this.generateMargin(largeAsset) : null}`,
             }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
@@ -161,32 +220,33 @@ class App extends React.Component {
   }
 
   // Change selected asset
-  handleAssetSquareClick(rowInd, colInd, assetList) {
-    let { assetBoardBackground, selectedAssetIsBackground } = this.state;
-    let selectedAsset = assetList[rowInd][colInd];
-    if (assetList === assetBoardBackground) {
-      selectedAssetIsBackground = true;
-    } else {
-      selectedAssetIsBackground = false;
-    }
+  handleAssetSquareClick(path) {
+    let selectedAssetIsBackground = COMBINED_TILES[path].type === TILE_TYPE.GROUND;
+
     this.setState({
-      selectedAsset,
+      selectedAsset: path,
       selectedAssetIsBackground,
       selectedAssetFlipStatus: 1,
       selectedAssetRotateStatus: 0,
+      selectedAssetSizeRatio: COMBINED_TILES[path].size,
     });
   }
 
   // Helper to render asset board's individual rows
-  renderAssetRow(row, rowInd, assetList) {
+  renderAssetRow(row, rowInd) {
     return row.map((path, colInd) => (
-      <img
-        className="AssetBoard-square"
-        row={rowInd}
-        col={colInd}
-        src={require(`./assets/${path}`)}
-        onClick={() => this.handleAssetSquareClick(rowInd, colInd, assetList)}
-      />
+      <div className="AssetBoard-square">
+        <img
+          className="AssetBoardImg"
+          row={rowInd}
+          col={colInd}
+          src={require(`./assets/${path}`)}
+          onClick={() => this.handleAssetSquareClick(path)}
+        />
+        {COMBINED_TILES[path].type === TILE_TYPE.HOLE ? (
+          <div className="HoleText">{COMBINED_TILES[path].label}</div>
+        ) : null}
+      </div>
     ));
   }
 
@@ -195,8 +255,8 @@ class App extends React.Component {
     return (
       <div className="AssetBoard-category">
         <h3>{categoryName}</h3>
-        {assetBoard.map((val, ind, assetList) => (
-          <div className="AssetBoard-row">{this.renderAssetRow(val, ind, assetList)}</div>
+        {assetBoard.map((val, ind) => (
+          <div className="AssetBoard-row">{this.renderAssetRow(val, ind)}</div>
         ))}
       </div>
     );
@@ -228,7 +288,9 @@ class App extends React.Component {
   }
 
   render() {
-    const { assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall } = this.state;
+    const {
+      assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall,
+    } = this.state;
     return (
       <div className="App">
         <div className="GameBoard">
@@ -253,7 +315,8 @@ class App extends React.Component {
             <br />
             <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
               Flip
-            </Button>{' '}
+            </Button>
+            {' '}
             <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
               Rotate
             </Button>
