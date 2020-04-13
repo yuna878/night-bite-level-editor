@@ -14,7 +14,7 @@ import {
 } from './tiles';
 
 const ASSETBOARD_COLS = 4;
-const GAMESQUARE_SIZE = 50;
+const GAMESQUARE_SIZE = 50; // From CSS .GameBoard-square size (in px)
 
 class App extends React.Component {
   constructor(props) {
@@ -55,6 +55,7 @@ class App extends React.Component {
     });
   }
 
+  // Initialize a list of assets for a category
   initializeAsset(assetDict) {
     let newBoard = [];
     const assetList = Object.keys(assetDict);
@@ -117,12 +118,14 @@ class App extends React.Component {
       largeAssetIndicator,
     } = this.state;
 
+    // Go through all tile coordinates that the asset should cover
     for (let i = 0; i < selectedAssetSizeRatio; i++) {
       for (let j = 0; j < selectedAssetSizeRatio; j++) {
         let x = rowInd + i;
         let y = colInd + j;
         if (x < boardRows && y < boardCols) {
           largeAssetIndicator[x][y] = [selectedAssetSizeRatio, i, j];
+          // Update boards depending on whether selected asset is a background tile
           if (selectedAssetIsBackground) {
             board[x][y] = [selectedAsset];
             flipAssetIndicator[x][y] = [selectedAssetFlipStatus];
@@ -140,6 +143,7 @@ class App extends React.Component {
         }
       }
     }
+
     this.setState({
       board,
       flipAssetIndicator,
@@ -244,7 +248,9 @@ class App extends React.Component {
           onClick={() => this.handleAssetSquareClick(path)}
         />
         {COMBINED_TILES[path].type === TILE_TYPE.HOLE ? (
-          <div className="HoleText">{COMBINED_TILES[path].label}</div>
+          <div className="HoleText" onClick={() => this.handleAssetSquareClick(path)}>
+            {COMBINED_TILES[path].label}
+          </div>
         ) : null}
       </div>
     ));
@@ -288,9 +294,7 @@ class App extends React.Component {
   }
 
   render() {
-    const {
-      assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall,
-    } = this.state;
+    const { assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall } = this.state;
     return (
       <div className="App">
         <div className="GameBoard">
@@ -315,8 +319,7 @@ class App extends React.Component {
             <br />
             <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
               Flip
-            </Button>
-            {' '}
+            </Button>{' '}
             <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
               Rotate
             </Button>
