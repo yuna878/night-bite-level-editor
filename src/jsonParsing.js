@@ -40,6 +40,7 @@ function stateToJson(state) {
   const teams = {};
   const characters = {};
   const items = {};
+  const decorations = {};
 
   // loop through each coordinate
   for (let x = 0; x < boardRows; x++) {
@@ -110,6 +111,15 @@ function stateToJson(state) {
               rotate,
             };
             break;
+          case TILE_TYPE.DECORATION:
+            decorations[`decoration_${x}_${y}`] = {
+              x,
+              y,
+              texture: path,
+              flip,
+              rotate,
+            };
+            break;
           default:
             break;
         }
@@ -125,6 +135,7 @@ function stateToJson(state) {
     teams,
     characters,
     items,
+    decorations,
   };
 }
 
@@ -132,10 +143,12 @@ async function jsonToState(dataStr, newBoards) {
   try {
     const text = await dataStr.text();
     const { board, flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = newBoards;
-    const { tiles, grounds, walls, holes, teams, characters, items } = JSON.parse(text);
+    const { tiles, grounds, walls, holes, teams, characters, items, decorations } = JSON.parse(
+      text
+    );
     const { rows, columns } = tiles;
 
-    const nongrounds = [walls, holes, teams, characters, items];
+    const nongrounds = [walls, holes, teams, characters, items, decorations];
 
     /*********** Ground Tiles ***********/
     Object.keys(grounds).forEach((tile) => {
