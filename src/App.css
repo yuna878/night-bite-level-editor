@@ -5,6 +5,11 @@
 
 .App {
   display: flex;
+  flex-direction: column;
+}
+
+.Development {
+  display: flex;
   flex-direction: row;
   font-family: RetroGame;
   font-size: 30px;
@@ -15,7 +20,6 @@
 .GameBoard {
   display: flex;
   flex-direction: column;
-  margin-left: 10px;
   padding-bottom: 10px;
   border-bottom: 2px solid black;
 }
@@ -35,9 +39,11 @@
   position: relative;
 }
 
+.AssetBoard {
+}
+
 .AssetScroller {
   overflow: scroll;
-  height: 70vh;
 }
 
 .SelectedAssetImg {
@@ -73,7 +79,7 @@
   height: 64px;
 }
 
-div .HoleText {
+div .HoleLabel {
   position: absolute;
   display: none;
   color: white;
@@ -81,7 +87,7 @@ div .HoleText {
   margin-top: -20px;
   width: 64px;
 }
-.AssetBoard-square:hover .HoleText {
+.AssetBoard-square:hover .HoleLabel {
   display: block;
 }
 

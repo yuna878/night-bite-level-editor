@@ -12,6 +12,7 @@ import {
   COMBINED_TILES,
   TILE_TYPE,
 } from './tiles';
+import { stateToJson } from './jsonParsing';
 
 const ASSETBOARD_COLS = 4;
 const GAMESQUARE_SIZE = 50; // From CSS .GameBoard-square size (in px)
@@ -35,7 +36,10 @@ class App extends React.Component {
       flipAssetIndicator: [], // 2d array where each element is an array of ints indicating flip status
       rotateAssetIndicator: [], // 2d array where each element is array of ints indicating degree of rotation
       largeAssetIndicator: [], // 2d array where each element is null or [size, x_coord, y_coord] for top-most image
+      fileName: null, // file name for saving level json
     };
+
+    this.handleFileNamechange = this.handleFileNamechange.bind(this);
   }
 
   // On startup
@@ -166,7 +170,6 @@ class App extends React.Component {
       const largeAsset = largeAssetIndicator[rowInd][colInd]
         ? largeAssetIndicator[rowInd][colInd]
         : false;
-      const largeAssetSize = largeAsset[0] * GAMESQUARE_SIZE;
 
       // Background tile only
       if (path.length === 1) {
@@ -248,7 +251,7 @@ class App extends React.Component {
           onClick={() => this.handleAssetSquareClick(path)}
         />
         {COMBINED_TILES[path].type === TILE_TYPE.HOLE ? (
-          <div className="HoleText" onClick={() => this.handleAssetSquareClick(path)}>
+          <div className="HoleLabel" onClick={() => this.handleAssetSquareClick(path)}>
             {COMBINED_TILES[path].label}
           </div>
         ) : null}
@@ -293,43 +296,77 @@ class App extends React.Component {
     this.setState({ selectedAssetRotateStatus });
   }
 
+  handleFileNamechange(event) {
+    this.setState({ fileName: event.target.value });
+  }
+
+  downloadFile() {
+    const { fileName } = this.state;
+    let download = document.getElementsByClassName('downloadFileLink')[0];
+    console.log(download);
+    download.setAttribute(
+      'href',
+      `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(stateToJson(this.state)))}`
+    );
+    download.setAttribute('download', `${fileName || 'level'}.json`);
+    download.click();
+  }
+
   render() {
-    const { assetBoardBackground, assetBoardItem, assetBoardHome, assetBoardWall } = this.state;
+    const {
+      assetBoardBackground,
+      assetBoardItem,
+      assetBoardHome,
+      assetBoardWall,
+      fileName,
+    } = this.state;
     return (
       <div className="App">
-        <div className="GameBoard">
-          <h>GAMEBOARD</h>
-          {this.renderGameBoard()}
-        </div>
-        <div className="Assets">
-          <div className="AssetBoard">
-            <h>ASSETBOARD</h>
-            <div className="AssetScroller">
-              {this.renderAssetBoard(assetBoardBackground, 'Background')}
-              {this.renderAssetBoard(assetBoardItem, 'Item')}
-              {this.renderAssetBoard(assetBoardHome, 'Home')}
-              {this.renderAssetBoard(assetBoardWall, 'Environment')}
+        <div className="Development">
+          <div className="GameBoard">
+            <h>GAMEBOARD</h>
+            {this.renderGameBoard()}
+          </div>
+          <div className="Assets">
+            <div className="AssetBoard">
+              <h>ASSETBOARD</h>
+              <div className="AssetScroller">
+                {this.renderAssetBoard(assetBoardBackground, 'Background')}
+                {this.renderAssetBoard(assetBoardItem, 'Item')}
+                {this.renderAssetBoard(assetBoardHome, 'Home')}
+                {this.renderAssetBoard(assetBoardWall, 'Environment')}
+              </div>
+            </div>
+
+            <div className="SelectedAsset">
+              <h>SELECTED ASSET</h>
+              <br />
+              {this.renderSelectedAsset()}
+              <br />
+              <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
+                Flip
+              </Button>{' '}
+              <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
+                Rotate
+              </Button>
+            </div>
+
+            <div className="ResetButton">
+              <Button outline color="danger" type="button" onClick={() => this.resetBoard()}>
+                Reset
+              </Button>
             </div>
           </div>
-
-          <div className="SelectedAsset">
-            <h>SELECTED ASSET</h>
-            <br />
-            {this.renderSelectedAsset()}
-            <br />
-            <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
-              Flip
-            </Button>{' '}
-            <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
-              Rotate
-            </Button>
-          </div>
-
-          <div className="ResetButton">
-            <Button outline color="danger" type="button" onClick={() => this.resetBoard()}>
-              Reset
-            </Button>
-          </div>
+        </div>
+        <div className="Files">
+          <input
+            type="text"
+            placeholder="Enter file name..."
+            value={fileName}
+            onChange={this.handleFileNamechange}
+          />
+          <Button onClick={() => this.downloadFile()}>Save Level</Button>
+          <a className="downloadFileLink" />
         </div>
       </div>
     );

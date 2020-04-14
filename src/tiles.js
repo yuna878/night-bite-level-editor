@@ -19,6 +19,7 @@ const HOME_TILES = {
   'environment/StallHome3_64.png': { type: TILE_TYPE.TEAM, size: 2 },
   'environment/StallHome4_64.png': { type: TILE_TYPE.TEAM, size: 2 },
 };
+
 const WALL_TILES = {
   'background/hole6_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '0' },
   'background/hole5_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '1' },
