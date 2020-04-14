@@ -11,9 +11,17 @@ const TILE_TYPE = {
 const BACKGROUND_TILES = {
   'background/ground_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/groundbrick_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  // palette 2
+  'background/ground_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/grounddark1_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/grounddark2_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/groundbrick_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/groundgrass_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
 };
 
-const ITEM_TILES = {};
+const ITEM_TILES = {
+  'item/food1_64.png': { type: TILE_TYPE.ITEM, size: 1 },
+};
 
 const HOME_TILES = {
   'environment/StallHome1_64.png': { type: TILE_TYPE.TEAM, size: 2, team: 'teamA' },
@@ -29,12 +37,23 @@ const WALL_TILES = {
   'background/hole4_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-adj' },
   'background/hole1_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '3' },
   'background/hole2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '4' },
+  // palette 2 holes
+  'background/hole0_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '0' },
+  'background/hole1_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '1' },
+  'background/hole2opp_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-opp' },
+  'background/hole2adj_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-adj' },
+  'background/hole3_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '3' },
+  'background/hole4_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '4' },
+  // ***
   'environment/Box_64.png': { type: TILE_TYPE.WALL, size: 1 },
+  'environment/box_palette2_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/DirectionsSign_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/HangingLantern_64.png': { type: TILE_TYPE.DECORATION, size: 1 },
   'environment/Shrub_64.png': { type: TILE_TYPE.WALL, size: 1 },
+  'environment/Shrub_palette2_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/StallItem1_64.png': { type: TILE_TYPE.WALL, size: 2 },
   'environment/StallOther1_64.png': { type: TILE_TYPE.WALL, size: 2 },
+  'environment/StallOther_palette2_64.png': { type: TILE_TYPE.WALL, size: 2 },
 };
 
 const CHARACTER_TILES = {
