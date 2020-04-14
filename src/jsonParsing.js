@@ -2,28 +2,30 @@
 /* eslint-disable spaced-comment */
 import { COMBINED_TILES, TILE_TYPE } from './tiles';
 
-function stateToJson(state) {
-  // this.state = {
-  //   boardRows: 12,
-  //   boardCols: 25,
-  //   board: [], // 2d array where each element is an array strings of path to asset
-  //   selectedAsset: 'background/ground_64.png',
-  //   selectedAssetIsBackground: true,
-  //   selectedAssetFlipStatus: 1, // 1: normal ; -1: flipped horizontally
-  //   selectedAssetRotateStatus: 0, // Degrees
-  //   selectedAssetSizeRatio: 1,
-  //   assetBoardBackground: [],
-  //   assetBoardItem: [],
-  //   assetBoardHome: [],
-  //   assetBoardWall: [],
-  //   flipAssetIndicator: [], // 2d array where each element is an array of ints indicating flip status
-  //   rotateAssetIndicator: [], // 2d array where each element is array of ints indicating degree of rotation
-  //   largeAssetIndicator: [], // 2d array where each element is null or [size, x_coord, y_coord] for top-most image
-  //   fileName: null, // file name for saving level json
-  // };
-  const { boardRows, boardCols, board, flipAssetIndicator, rotateAssetIndicator } = state;
+let largeAssetIndicatorGlobal;
 
-  /**** BOARD INFORMATION ****/
+function isLargeAssetTopLeft(x, y) {
+  const assetInfo = largeAssetIndicatorGlobal[x][y];
+  console.log(assetInfo, x, y);
+  return assetInfo[1] === 0 && assetInfo[2] === 0;
+}
+
+function isLargeAsset(path) {
+  return COMBINED_TILES[path].size > 1;
+}
+
+function stateToJson(state) {
+  const {
+    boardRows,
+    boardCols,
+    board,
+    flipAssetIndicator,
+    rotateAssetIndicator,
+    largeAssetIndicator,
+  } = state;
+  largeAssetIndicatorGlobal = largeAssetIndicator;
+
+  /**** Board information ****/
   const tiles = {
     height: 64,
     width: 64,
@@ -36,6 +38,7 @@ function stateToJson(state) {
   const holes = {};
   const walls = {};
   const teams = {};
+  const characters = {};
   const items = {};
 
   // loop through each coordinate
@@ -45,15 +48,19 @@ function stateToJson(state) {
       const assetArr = board[x][y];
       for (let ind = 0; ind < assetArr.length; ind++) {
         const path = assetArr[ind];
-        const flip = flipAssetIndicator[x][y][ind] === -1;
-        const rotate = rotateAssetIndicator[x][y][ind] % 90;
+        const flip = flipAssetIndicator[x][y][ind] === -1; // flip to boolean
+        const rotate = rotateAssetIndicator[x][y][ind] / 90; // degrees to number of 90deg turns
+
+        if (ind > 0 && isLargeAsset(path) && !isLargeAssetTopLeft(x, y)) {
+          continue;
+        }
 
         switch (COMBINED_TILES[path].type) {
           case TILE_TYPE.GROUND:
             grounds[`ground_${x}_${y}`] = {
               x,
               y,
-              asset: path,
+              texture: path,
               flip,
               rotate,
             };
@@ -62,27 +69,34 @@ function stateToJson(state) {
             holes[`hole_${x}_${y}`] = {
               x,
               y,
-              asset: path,
+              texture: path,
               flip,
               rotate,
-              // texture,
             };
             break;
           case TILE_TYPE.WALL:
             walls[`wall_${x}_${y}`] = {
               x,
               y,
-              asset: path,
+              texture: path,
               flip,
               rotate,
-              // texture,
             };
             break;
           case TILE_TYPE.TEAM:
-            teams[`team_${x}_${y}`] = {
+            teams[COMBINED_TILES[path].team] = {
               x,
               y,
-              asset: path,
+              texture: path,
+              flip,
+              rotate,
+            };
+            break;
+          case TILE_TYPE.CHARACTER:
+            characters[COMBINED_TILES[path].team] = {
+              x,
+              y,
+              texture: path,
               flip,
               rotate,
             };
@@ -91,7 +105,7 @@ function stateToJson(state) {
             items[`item_${x}_${y}`] = {
               x,
               y,
-              asset: path,
+              texture: path,
               flip,
               rotate,
             };
@@ -109,8 +123,66 @@ function stateToJson(state) {
     walls,
     holes,
     teams,
+    characters,
     items,
   };
 }
 
-export { stateToJson };
+async function jsonToState(dataStr, newBoards) {
+  try {
+    const text = await dataStr.text();
+    const { board, flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = newBoards;
+    const { tiles, grounds, walls, holes, teams, characters, items } = JSON.parse(text);
+    const { rows, columns } = tiles;
+
+    const nongrounds = [walls, holes, teams, characters, items];
+
+    /*********** Ground Tiles ***********/
+    Object.keys(grounds).forEach((tile) => {
+      const { x, y, texture, flip, rotate } = grounds[tile];
+      board[x][y][0] = texture;
+      flipAssetIndicator[x][y][0] = flip ? -1 : 1; // boolean to flip
+      rotateAssetIndicator[x][y][0] = rotate * 90; //  number of 90deg turns to total degree of rotation
+    });
+
+    /*********** Non-ground Tiles ***********/
+    for (var tilesObj of nongrounds) {
+      Object.keys(tilesObj).forEach((tile) => {
+        const { x, y, texture, flip, rotate } = tilesObj[tile];
+        const sizeRatio = COMBINED_TILES[texture].size;
+        for (let i = 0; i < sizeRatio; i++) {
+          for (let j = 0; j < sizeRatio; j++) {
+            const newX = x + i;
+            const newY = y + j;
+            if (newX < rows && newY < columns) {
+              if (isLargeAsset(texture) && board[newX][newY].length > 1) {
+                continue;
+              }
+              largeAssetIndicator[newX][newY] = [sizeRatio, i, j];
+              if (board[newX][newY].length !== 1) {
+                board[newX][newY].pop();
+                flipAssetIndicator[newX][newY].pop();
+                rotateAssetIndicator[newX][newY].pop();
+              }
+              board[newX][newY].push(texture);
+              flipAssetIndicator[newX][newY].push(flip ? -1 : 1); // boolean to flip
+              rotateAssetIndicator[newX][newY].push(rotate * 90); //  number of 90deg turns to total degree of rotation
+            }
+          }
+        }
+      });
+    }
+
+    return {
+      board,
+      flipAssetIndicator,
+      rotateAssetIndicator,
+      largeAssetIndicator,
+    };
+  } catch (err) {
+    alert(`*** FAILED PARSING FILE ***\n${err}`);
+    return null;
+  }
+}
+
+export { stateToJson, jsonToState };

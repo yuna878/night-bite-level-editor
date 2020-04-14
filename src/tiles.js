@@ -4,6 +4,8 @@ const TILE_TYPE = {
   HOLE: 'hole',
   TEAM: 'team',
   ITEM: 'item',
+  CHARACTER: 'character',
+  DECORATION: 'decoration',
 };
 
 const BACKGROUND_TILES = {
@@ -14,10 +16,10 @@ const BACKGROUND_TILES = {
 const ITEM_TILES = {};
 
 const HOME_TILES = {
-  'environment/StallHome1_64.png': { type: TILE_TYPE.TEAM, size: 2 },
-  'environment/StallHome2_64.png': { type: TILE_TYPE.TEAM, size: 2 },
-  'environment/StallHome3_64.png': { type: TILE_TYPE.TEAM, size: 2 },
-  'environment/StallHome4_64.png': { type: TILE_TYPE.TEAM, size: 2 },
+  'environment/StallHome1_64.png': { type: TILE_TYPE.TEAM, size: 2, team: 'teamA' },
+  'environment/StallHome2_64.png': { type: TILE_TYPE.TEAM, size: 2, team: 'teamB' },
+  'environment/StallHome3_64.png': { type: TILE_TYPE.TEAM, size: 2, team: 'teamC' },
+  'environment/StallHome4_64.png': { type: TILE_TYPE.TEAM, size: 2, team: 'teamD' },
 };
 
 const WALL_TILES = {
@@ -29,13 +31,35 @@ const WALL_TILES = {
   'background/hole2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '4' },
   'environment/Box_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/DirectionsSign_64.png': { type: TILE_TYPE.WALL, size: 1 },
-  'environment/HangingLantern_64.png': { type: TILE_TYPE.WALL, size: 1 },
+  'environment/HangingLantern_64.png': { type: TILE_TYPE.DECORATION, size: 1 },
   'environment/Shrub_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/StallItem1_64.png': { type: TILE_TYPE.WALL, size: 2 },
   'environment/StallOther1_64.png': { type: TILE_TYPE.WALL, size: 2 },
 };
 
-const COMBINED_TILES = {};
-Object.assign(COMBINED_TILES, BACKGROUND_TILES, ITEM_TILES, HOME_TILES, WALL_TILES);
+const CHARACTER_TILES = {
+  'character/P1_64.png': { type: TILE_TYPE.CHARACTER, size: 1, team: 'teamA' },
+  'character/P2_64_v2.png': { type: TILE_TYPE.CHARACTER, size: 1, team: 'teamB' },
+  'character/P3_64_v2.png': { type: TILE_TYPE.CHARACTER, size: 1, team: 'teamC' },
+  'character/P4_64.png': { type: TILE_TYPE.CHARACTER, size: 1, team: 'teamD' },
+};
 
-export { BACKGROUND_TILES, ITEM_TILES, HOME_TILES, WALL_TILES, TILE_TYPE, COMBINED_TILES };
+const COMBINED_TILES = {};
+Object.assign(
+  COMBINED_TILES,
+  BACKGROUND_TILES,
+  ITEM_TILES,
+  HOME_TILES,
+  WALL_TILES,
+  CHARACTER_TILES
+);
+
+export {
+  BACKGROUND_TILES,
+  ITEM_TILES,
+  HOME_TILES,
+  WALL_TILES,
+  CHARACTER_TILES,
+  TILE_TYPE,
+  COMBINED_TILES,
+};
