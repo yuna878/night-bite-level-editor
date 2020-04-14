@@ -139,3 +139,7 @@ input {
 button {
   font-size: 15px;
 }
+
+div:focus {
+  outline: none;
+}

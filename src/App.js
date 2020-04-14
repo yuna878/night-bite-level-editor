@@ -2,6 +2,7 @@
 /* eslint-disable no-plusplus */
 import React from 'react';
 import { Button } from 'reactstrap';
+import { HotKeys } from 'react-hotkeys';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 import {
@@ -22,6 +23,12 @@ const DEFAULT_SELECTED_ASSET_IS_BACKGROUND = true;
 const DEFAULT_SELECTED_ASSET_FLIP_STATUS = 1;
 const DEFAULT_SELECTED_ASSET_ROTATE_STATUS = 0;
 const DEFAULT_SELECTED_ASSET_SIZE_RATIO = 1;
+
+const hotKeyMap = {
+  HOTKEY_ROTATE: 'r',
+  HOTKEY_ERASE: 'e',
+  HOTKEY_FLIP: 'f',
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -354,6 +361,12 @@ class App extends React.Component {
     }
   }
 
+  hotKeyHandlers = {
+    HOTKEY_ROTATE: () => this.rotateAsset(),
+    HOTKEY_ERASE: () => this.setState({ eraseMode: !this.state.eraseMode }),
+    HOTKEY_FLIP: () => this.flipAsset(),
+  };
+
   render() {
     const {
       assetBoardBackground,
@@ -364,69 +377,72 @@ class App extends React.Component {
       fileName,
       eraseMode,
     } = this.state;
+
     return (
       <div className="App">
-        <div className="Development">
-          <div className="GameBoard">
-            <h>GAMEBOARD</h>
-            {this.renderGameBoard()}
-            <div className="Files">
-              <text>Export Level: </text>
-              <input
-                type="text"
-                placeholder="Enter file name...(Default: level)"
-                value={fileName}
-                onChange={this.handleFileNamechange}
-              />
-              <button onClick={() => this.downloadFile()}>Save Level</button>
-              <a id="downloadFileLink" />
-              <br />
-              <text style={{ color: 'gray' }}>OR</text>
-              <br />
-              <text>Import Level: </text>
-              <input type="file" id="loadJSON" />
-              <button onClick={() => this.loadFile()}>Load Level</button>
-            </div>
-          </div>
-          <div className="Assets">
-            <div className="AssetBoard">
-              <h>ASSETBOARD</h>
-              <div className="AssetScroller">
-                {this.renderAssetBoard(assetBoardBackground, 'Background')}
-                {this.renderAssetBoard(assetBoardItem, 'Item')}
-                {this.renderAssetBoard(assetBoardHome, 'Home')}
-                {this.renderAssetBoard(assetBoardCharacter, 'Character')}
-                {this.renderAssetBoard(assetBoardWall, 'Environment')}
+        <HotKeys keyMap={hotKeyMap} handlers={this.hotKeyHandlers}>
+          <div className="Development">
+            <div className="GameBoard">
+              <h>GAMEBOARD</h>
+              {this.renderGameBoard()}
+              <div className="Files">
+                <text>Export Level: </text>
+                <input
+                  type="text"
+                  placeholder="Enter file name...(Default: level)"
+                  value={fileName}
+                  onChange={this.handleFileNamechange}
+                />
+                <button onClick={() => this.downloadFile()}>Save Level</button>
+                <a id="downloadFileLink" />
+                <br />
+                <text style={{ color: 'gray' }}>OR</text>
+                <br />
+                <text>Import Level: </text>
+                <input type="file" id="loadJSON" />
+                <button onClick={() => this.loadFile()}>Load Level</button>
               </div>
             </div>
+            <div className="Assets">
+              <div className="AssetBoard">
+                <h>ASSETBOARD</h>
+                <div className="AssetScroller">
+                  {this.renderAssetBoard(assetBoardBackground, 'Background')}
+                  {this.renderAssetBoard(assetBoardItem, 'Item')}
+                  {this.renderAssetBoard(assetBoardHome, 'Home')}
+                  {this.renderAssetBoard(assetBoardCharacter, 'Character')}
+                  {this.renderAssetBoard(assetBoardWall, 'Environment')}
+                </div>
+              </div>
 
-            <div className="SelectedAsset">
-              <h>SELECTED ASSET</h>
-              <br />
-              {this.renderSelectedAsset()}
-              <br />
-              <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
-                Flip
-              </Button>{' '}
-              <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
-                Rotate
-              </Button>{' '}
-              <Button
-                color={eraseMode ? 'warning' : 'outline-warning'}
-                type="button"
-                onClick={() => this.setState({ eraseMode: !eraseMode })}
-              >
-                Eraser
-              </Button>
-            </div>
+              <div className="SelectedAsset">
+                <h>SELECTED ASSET</h>
+                <br />
+                {this.renderSelectedAsset()}
+                <br />
+                <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
+                  Flip
+                </Button>{' '}
+                <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
+                  Rotate
+                </Button>{' '}
+                <Button
+                  color={eraseMode ? 'warning' : 'outline-warning'}
+                  type="button"
+                  onClick={() => this.setState({ eraseMode: !eraseMode })}
+                >
+                  Eraser
+                </Button>
+              </div>
 
-            <div className="ResetButton">
-              <Button outline color="danger" type="button" onClick={() => this.resetBoard()}>
-                Reset
-              </Button>
+              <div className="ResetButton">
+                <Button outline color="danger" type="button" onClick={() => this.resetBoard()}>
+                  Reset
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </HotKeys>{' '}
       </div>
     );
   }
