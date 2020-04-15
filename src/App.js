@@ -34,8 +34,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      boardRows: 12,
-      boardCols: 25,
+      boardRows: 10,
+      boardCols: 20,
       board: [], // 2d array where each element is an array strings of path to asset
       selectedAsset: DEFAULT_SELECTED_ASSET,
       selectedAssetIsBackground: DEFAULT_SELECTED_ASSET_IS_BACKGROUND,
