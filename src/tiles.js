@@ -11,6 +11,8 @@ const TILE_TYPE = {
 const BACKGROUND_TILES = {
   'background/ground_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/groundgrass_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/grounddark1_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/grounddark2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/groundbrick_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   // palette 2
   'background/ground_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
