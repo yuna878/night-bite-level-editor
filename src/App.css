@@ -89,13 +89,13 @@
 }
 
 div .HoleLabel {
-  position: absolute;
   display: none;
-  color: white;
+  color: blue;
   font-size: 14px;
   margin-top: -20px;
   width: 64px;
 }
+
 .AssetBoard-square:hover .HoleLabel {
   display: block;
 }

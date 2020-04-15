@@ -54,6 +54,7 @@ const WALL_TILES = {
   'environment/Shrub_palette2_64.png': { type: TILE_TYPE.WALL, size: 1 },
   'environment/StallItem1_64.png': { type: TILE_TYPE.WALL, size: 2 },
   'environment/StallOther1_64.png': { type: TILE_TYPE.WALL, size: 2 },
+  'environment/StallOther2_64.png': { type: TILE_TYPE.WALL, size: 2 },
   'environment/StallOther_palette2_64.png': { type: TILE_TYPE.WALL, size: 2 },
 };
 
