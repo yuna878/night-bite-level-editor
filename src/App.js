@@ -41,7 +41,8 @@ class App extends React.Component {
       selectedAssetIsBackground: DEFAULT_SELECTED_ASSET_IS_BACKGROUND,
       selectedAssetFlipStatus: DEFAULT_SELECTED_ASSET_FLIP_STATUS, // 1: normal ; -1: flipped horizontally
       selectedAssetRotateStatus: DEFAULT_SELECTED_ASSET_ROTATE_STATUS, // Degrees
-      selectedAssetSizeRatio: DEFAULT_SELECTED_ASSET_SIZE_RATIO,
+      selectedAssetSizeWidth: DEFAULT_SELECTED_ASSET_SIZE_RATIO,
+      selectedAssetSizeHeight: DEFAULT_SELECTED_ASSET_SIZE_RATIO,
       assetBoardBackground: [],
       assetBoardItem: [],
       assetBoardHome: [],
@@ -49,7 +50,7 @@ class App extends React.Component {
       assetBoardCharacter: [],
       flipAssetIndicator: [], // 2d array where each element is an array of ints indicating flip status
       rotateAssetIndicator: [], // 2d array where each element is array of ints indicating degree of rotation
-      largeAssetIndicator: [], // 2d array where each element is null or [size, x_coord relative to image, y_coord relative to image]
+      largeAssetIndicator: [], // 2d array where each element is null or [width, height, x_coord relative to image, y_coord relative to image]
       fileName: null, // file name for saving level json
       eraseMode: false,
     };
@@ -135,7 +136,8 @@ class App extends React.Component {
       selectedAssetIsBackground,
       selectedAssetFlipStatus,
       selectedAssetRotateStatus,
-      selectedAssetSizeRatio,
+      selectedAssetSizeWidth,
+      selectedAssetSizeHeight,
       flipAssetIndicator,
       rotateAssetIndicator,
       largeAssetIndicator,
@@ -150,8 +152,8 @@ class App extends React.Component {
       }
     } else {
       // Go through all tile coordinates that the asset should cover
-      for (let i = 0; i < selectedAssetSizeRatio; i++) {
-        for (let j = 0; j < selectedAssetSizeRatio; j++) {
+      for (let i = 0; i < selectedAssetSizeHeight; i++) {
+        for (let j = 0; j < selectedAssetSizeWidth; j++) {
           let x = rowInd + i;
           let y = colInd + j;
           if (x < boardRows && y < boardCols) {
@@ -161,7 +163,7 @@ class App extends React.Component {
               flipAssetIndicator[x][y][0] = selectedAssetFlipStatus;
               rotateAssetIndicator[x][y][0] = selectedAssetRotateStatus;
             } else {
-              largeAssetIndicator[x][y] = [selectedAssetSizeRatio, i, j];
+              largeAssetIndicator[x][y] = [selectedAssetSizeWidth, selectedAssetSizeHeight, i, j];
               if (board[x][y].length !== 1) {
                 board[x][y].pop();
                 flipAssetIndicator[x][y].pop();
@@ -184,8 +186,8 @@ class App extends React.Component {
   }
 
   generateMargin(assetInfo) {
-    const x = assetInfo[1];
-    const y = assetInfo[2];
+    const x = assetInfo[2];
+    const y = assetInfo[3];
     return `${-GAMESQUARE_SIZE * x}px 0px 0px ${-GAMESQUARE_SIZE * y}px`;
   }
 
@@ -232,8 +234,8 @@ class App extends React.Component {
             src={require(`./assets/${path[1]}`)}
             style={{
               transform: `scaleX(${flipAssetIndicator[rowInd][colInd][1]}) rotate(${rotateAssetIndicator[rowInd][colInd][1]}deg)`,
-              height: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
               width: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
+              height: `${largeAsset ? largeAsset[1] * GAMESQUARE_SIZE : null}px`,
               margin: `${largeAsset ? this.generateMargin(largeAsset) : null}`,
             }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
@@ -260,7 +262,8 @@ class App extends React.Component {
       selectedAssetIsBackground,
       selectedAssetFlipStatus: 1,
       selectedAssetRotateStatus: 0,
-      selectedAssetSizeRatio: COMBINED_TILES[path].size,
+      selectedAssetSizeWidth: COMBINED_TILES[path].width,
+      selectedAssetSizeHeight: COMBINED_TILES[path].height,
       eraseMode: false,
     });
   }

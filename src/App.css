@@ -52,7 +52,7 @@
 
 .AssetScroller {
   overflow: scroll;
-  height: 550px;
+  height: 500px;
 }
 
 .SelectedAssetImg {
