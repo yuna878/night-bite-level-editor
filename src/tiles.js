@@ -10,13 +10,14 @@ const TILE_TYPE = {
 
 const BACKGROUND_TILES = {
   'background/ground_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/groundgrass_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/groundbrick_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   // palette 2
   'background/ground_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
+  'background/groundgrass_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/grounddark1_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/grounddark2_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
   'background/groundbrick_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
-  'background/groundgrass_palette2_64.png': { type: TILE_TYPE.GROUND, size: 1 },
 };
 
 const ITEM_TILES = {
