@@ -31,12 +31,12 @@ const HOME_TILES = {
 };
 
 const WALL_TILES = {
-  'background/hole6_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '0' },
-  'background/hole5_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '1' },
-  'background/hole3_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-opp' },
-  'background/hole4_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-adj' },
-  'background/hole1_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '3' },
-  'background/hole2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '4' },
+  'background/hole0_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '0' },
+  'background/hole1_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '1' },
+  'background/hole2opp_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-opp' },
+  'background/hole2adj_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '2-adj' },
+  'background/hole3_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '3' },
+  'background/hole4_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '4' },
   // palette 2 holes
   'background/hole0_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '0' },
   'background/hole1_palette2_64.png': { type: TILE_TYPE.HOLE, size: 1, label: '1' },
