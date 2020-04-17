@@ -1,5 +1,7 @@
 ## Night Bite Level Editor
 
+Link to deployed site: `https://night-bite-level-editor.herokuapp.com/`
+
 Current version: `pre-beta`
 
 Current board size: `20x10`
