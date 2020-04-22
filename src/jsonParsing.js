@@ -70,6 +70,7 @@ function stateToJson(state) {
           texture: path,
           flip,
           rotate,
+          type,
         });
       }
       // Finished processing a tile
@@ -98,8 +99,8 @@ async function jsonToState(dataStr, newBoards) {
         const assetArr = assets[rowInd][colInd];
         // loop through all assets on the x,y coordinate
         for (let ind = 0; ind < assetArr.length; ind++) {
-          const { texture, flip, rotate } = assetArr[ind];
-          if (ind === 0) {
+          const { texture, flip, rotate, type } = assetArr[ind];
+          if (type === TILE_TYPE.GROUND) {
             /*********** Ground Tiles ***********/
             board[rowInd][colInd][0] = texture;
             flipAssetIndicator[rowInd][colInd][0] = flip ? -1 : 1; // boolean to flip
