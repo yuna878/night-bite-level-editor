@@ -31,6 +31,7 @@
   border-left: 2px solid black;
   border-right: 2px solid black;
   border-bottom: 2px solid black;
+  max-width: 280px;
 }
 
 .Files {
@@ -51,6 +52,8 @@
 }
 
 .AssetScroller {
+  padding-top: 5px;
+  border-top: 1px solid grey;
   overflow: scroll;
   height: 500px;
 }
@@ -58,6 +61,7 @@
 .SelectedAssetImg {
   width: 64px;
   height: 64px;
+  border: 1px solid rgb(203, 202, 202);
 }
 
 .SelectedAsset,
@@ -67,8 +71,7 @@
   border-top: 2px solid black;
 }
 
-.GameBoard-row,
-.AssetBoard-row {
+.GameBoard-row {
   margin: 0;
   line-height: 0px;
   display: flex;
@@ -88,22 +91,32 @@
   height: 64px;
 }
 
-div .HoleLabel {
+div .Label {
   display: none;
-  color: blue;
-  font-size: 14px;
+  font-size: 10px;
   margin-top: -20px;
   width: 64px;
 }
 
-.AssetBoard-square:hover .HoleLabel {
+.AssetBoard-square:hover .Label {
   display: block;
+}
+
+#light {
+  color: white;
 }
 
 .AssetBoard-category {
   padding-bottom: 5px;
   margin-bottom: 5px;
   border-bottom: 1px solid grey;
+}
+
+.AssetBoard-category-images {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 Button {
@@ -141,6 +154,27 @@ button {
   font-size: 15px;
 }
 
-div:focus {
+:focus,
+.focus {
   outline: none;
+  box-shadow: none !important;
+}
+
+/* Palette selectors */
+label.btn.btn-primary {
+  background-color: rgb(126, 184, 162);
+  border-color: rgb(126, 184, 162);
+  font-size: 10px;
+}
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active,
+.show > .btn-primary.dropdown-toggle {
+  background-color: rgb(49, 138, 101) !important;
+  border-color: rgb(49, 138, 101) !important;
+}
+.btn-group {
+  padding: 5px;
+}
+label input {
+  width: fit-content;
 }

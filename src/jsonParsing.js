@@ -32,109 +32,56 @@ function stateToJson(state) {
     columns: boardCols,
   };
 
-  /**** Loop through each tile and put into appropriate type's dictionary ****/
-  const grounds = {};
-  const holes = {};
-  const walls = {};
-  const teams = {};
-  const characters = {};
-  const items = {};
-  const decorations = {};
+  /**** Loop through each tile and generate 3d array of asset information ****/
+  const assets = [];
 
   // loop through each coordinate
   for (let y = 0; y < boardRows; y++) {
+    const newRow = [];
     for (let x = 0; x < boardCols; x++) {
-      // loop through all assets on the x,y coordinate
+      const currentCoord = [];
       const assetArr = board[y][x];
+      // loop through all assets on the x,y coordinate
       for (let ind = 0; ind < assetArr.length; ind++) {
         const path = assetArr[ind];
         const flip = flipAssetIndicator[y][x][ind] === -1; // flip to boolean
         const rotate = rotateAssetIndicator[y][x][ind] / 90; // degrees to number of 90deg turns
 
+        // Skip if part of large asset
         if (ind > 0 && isLargeAsset(path) && !isLargeAssetTopLeft(y, x)) {
           continue;
         }
 
-        switch (COMBINED_TILES[path].type) {
-          case TILE_TYPE.GROUND:
-            grounds[`ground_${x}_${y}`] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.HOLE:
-            holes[`hole_${x}_${y}`] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.WALL:
-            walls[`wall_${x}_${y}`] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.TEAM:
-            teams[COMBINED_TILES[path].team] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.CHARACTER:
-            characters[COMBINED_TILES[path].team] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.ITEM:
-            items[`item_${x}_${y}`] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
-            break;
-          case TILE_TYPE.DECORATION:
-            decorations[`decoration_${x}_${y}`] = {
-              x,
-              y,
-              texture: path,
-              flip,
-              rotate,
-            };
+        // Get appropriate name depending on tile type
+        const { type } = COMBINED_TILES[path];
+        let name;
+        switch (type) {
+          case TILE_TYPE.TEAM || TILE_TYPE.CHARACTER:
+            name = COMBINED_TILES[path].team;
             break;
           default:
+            name = `${type}_${x}_${y}`;
             break;
         }
+
+        // Add to current coordinate array
+        currentCoord.push({
+          name,
+          texture: path,
+          flip,
+          rotate,
+        });
       }
+      // Finished processing a tile
+      newRow.push(currentCoord);
     }
+    //Finished processing a row
+    assets.push(newRow);
   }
 
   return {
     tiles,
-    grounds,
-    walls,
-    holes,
-    teams,
-    characters,
-    items,
-    decorations,
+    assets,
   };
 }
 
@@ -142,50 +89,53 @@ async function jsonToState(dataStr, newBoards) {
   try {
     const text = await dataStr.text();
     const { board, flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = newBoards;
-    const { tiles, grounds, walls, holes, teams, characters, items, decorations } = JSON.parse(
-      text
-    );
+    const { tiles, assets } = JSON.parse(text);
     const { rows, columns } = tiles;
 
-    const nongrounds = [walls, holes, teams, characters, items, decorations];
-
-    /*********** Ground Tiles ***********/
-    Object.keys(grounds).forEach((tile) => {
-      const { x, y, texture, flip, rotate } = grounds[tile];
-      console.log(tile);
-      board[y][x][0] = texture;
-      flipAssetIndicator[y][x][0] = flip ? -1 : 1; // boolean to flip
-      rotateAssetIndicator[y][x][0] = rotate * 90; //  number of 90deg turns to total degree of rotation
-    });
-
-    /*********** Non-ground Tiles ***********/
-    for (var tilesObj of nongrounds) {
-      Object.keys(tilesObj).forEach((tile) => {
-        console.log(tile);
-        const { x, y, texture, flip, rotate } = tilesObj[tile];
-        const sizeWidth = COMBINED_TILES[texture].width;
-        const sizeHeight = COMBINED_TILES[texture].height;
-        for (let i = 0; i < sizeHeight; i++) {
-          for (let j = 0; j < sizeWidth; j++) {
-            const newY = y + i;
-            const newX = x + j;
-            if (newY < rows && newX < columns) {
-              if (isLargeAsset(texture) && board[newY][newX].length > 1) {
-                continue;
+    // loop through each coordinate
+    for (let rowInd = 0; rowInd < rows; rowInd++) {
+      for (let colInd = 0; colInd < columns; colInd++) {
+        const assetArr = assets[rowInd][colInd];
+        // loop through all assets on the x,y coordinate
+        for (let ind = 0; ind < assetArr.length; ind++) {
+          const { texture, flip, rotate } = assetArr[ind];
+          if (ind === 0) {
+            /*********** Ground Tiles ***********/
+            board[rowInd][colInd][0] = texture;
+            flipAssetIndicator[rowInd][colInd][0] = flip ? -1 : 1; // boolean to flip
+            rotateAssetIndicator[rowInd][colInd][0] = rotate * 90; //  number of 90deg turns to total degree of rotation
+          } else {
+            /*********** Non-ground Tiles ***********/
+            const sizeWidth = COMBINED_TILES[texture].width;
+            const sizeHeight = COMBINED_TILES[texture].height;
+            // Mainly for large assets -> Go through all coordinates that is covered by the asset
+            for (let i = 0; i < sizeHeight; i++) {
+              for (let j = 0; j < sizeWidth; j++) {
+                const newRowInd = rowInd + i;
+                const newColInd = colInd + j;
+                // Check new coordinate is in bounds of board
+                if (newRowInd < rows && newColInd < columns) {
+                  // Skip if large asset should be rendered, but there is already another overlay asset
+                  if (isLargeAsset(texture) && board[newRowInd][newColInd].length > 1) {
+                    continue;
+                  }
+                  // Clear out existing info, if any
+                  if (board[newRowInd][newColInd].length !== 1) {
+                    board[newRowInd][newColInd].pop();
+                    flipAssetIndicator[newRowInd][newColInd].pop();
+                    rotateAssetIndicator[newRowInd][newColInd].pop();
+                  }
+                  // Update all information
+                  board[newRowInd][newColInd].push(texture);
+                  flipAssetIndicator[newRowInd][newColInd].push(flip ? -1 : 1); // boolean to flip
+                  rotateAssetIndicator[newRowInd][newColInd].push(rotate * 90); //  number of 90deg turns to total degree of rotation
+                  largeAssetIndicator[newRowInd][newColInd] = [sizeWidth, sizeHeight, i, j];
+                }
               }
-              largeAssetIndicator[newY][newX] = [sizeWidth, sizeHeight, i, j];
-              if (board[newY][newX].length !== 1) {
-                board[newY][newX].pop();
-                flipAssetIndicator[newY][newX].pop();
-                rotateAssetIndicator[newY][newX].pop();
-              }
-              board[newY][newX].push(texture);
-              flipAssetIndicator[newY][newX].push(flip ? -1 : 1); // boolean to flip
-              rotateAssetIndicator[newY][newX].push(rotate * 90); //  number of 90deg turns to total degree of rotation
             }
           }
         }
-      });
+      }
     }
 
     return {
@@ -200,4 +150,17 @@ async function jsonToState(dataStr, newBoards) {
   }
 }
 
-export { stateToJson, jsonToState };
+function assetToJson() {
+  const assets = {};
+  Object.keys(COMBINED_TILES).forEach((tile) => {
+    const { type } = COMBINED_TILES[tile];
+    if (assets[type]) {
+      assets[type].push(tile);
+    } else {
+      assets[type] = [tile];
+    }
+  });
+  return assets;
+}
+
+export { stateToJson, jsonToState, assetToJson };
