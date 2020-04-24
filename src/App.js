@@ -18,7 +18,6 @@ import {
   ITEM_TILES,
   TILE_TYPE,
   COMBINED_TILES,
-  LIGHT_SOURCE,
 } from './tiles';
 import { stateToJson, jsonToState, assetToJson } from './jsonParsing';
 
@@ -290,7 +289,7 @@ class App extends React.Component {
               className="LightSource"
               row={rowInd}
               col={colInd}
-              src={require(`./assets/${LIGHT_SOURCE}`)}
+              src={require(`./assets/light_64.png`)}
               onClick={() => this.handleGameSquareClick(rowInd, colInd)}
             />
           ) : null}

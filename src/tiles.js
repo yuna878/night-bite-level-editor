@@ -360,8 +360,6 @@ Object.assign(
   ITEM_TILES
 );
 
-const LIGHT_SOURCE = 'light_64.png';
-
 export {
   GROUND_TILES,
   BRICK_TILES,
@@ -373,5 +371,4 @@ export {
   ITEM_TILES,
   TILE_TYPE,
   COMBINED_TILES,
-  LIGHT_SOURCE,
 };
