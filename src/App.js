@@ -18,6 +18,7 @@ import {
   ITEM_TILES,
   TILE_TYPE,
   COMBINED_TILES,
+  LIGHT_SOURCE,
 } from './tiles';
 import { stateToJson, jsonToState, assetToJson } from './jsonParsing';
 
@@ -33,6 +34,7 @@ const hotKeyMap = {
   HOTKEY_ROTATE: 'r',
   HOTKEY_ERASE: 'e',
   HOTKEY_FLIP: 'f',
+  HOTKEY_LIGHT: 't',
 };
 
 class App extends React.Component {
@@ -41,10 +43,11 @@ class App extends React.Component {
     this.state = {
       boardRows: 12,
       boardCols: 20,
-      board: [], // 2d array where each element is an array strings of path to asset
-      flipAssetIndicator: [], // 2d array where each element is an array of ints indicating flip status
-      rotateAssetIndicator: [], // 2d array where each element is array of ints indicating degree of rotation
+      board: [], // 3d array : row x column x array of strings of path to asset
+      flipAssetIndicator: [], // 3d array : row x column x array of ints indicating flip status
+      rotateAssetIndicator: [], // 3d array : row x column x array of ints indicating degree of rotation
       largeAssetIndicator: [], // 2d array where each element is null or [width, height, x_coord relative to image, y_coord relative to image]
+      lightIndicator: [], // 2d array where each element is a boolean indicating whether asset needs a light source (for large asset, only indicated for top-left position)
       selectedAsset: DEFAULT_SELECTED_ASSET,
       selectedAssetIsBackground: DEFAULT_SELECTED_ASSET_IS_BACKGROUND,
       selectedAssetFlipStatus: DEFAULT_SELECTED_ASSET_FLIP_STATUS, // 1: normal ; -1: flipped horizontally
@@ -61,6 +64,7 @@ class App extends React.Component {
       assetBoardItem: [],
       fileName: null, // file name for saving level json
       eraseMode: false,
+      lightMode: false,
       selectedPalette: 'All', // selected color palette for assets
     };
 
@@ -107,27 +111,32 @@ class App extends React.Component {
     let flipAssetIndicator = [];
     let rotateAssetIndicator = [];
     let largeAssetIndicator = [];
+    let lightIndicator = [];
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
       let newFlipRow = [];
       let newRotateRow = [];
       let newLargeRow = [];
+      let newLightRow = [];
       for (let j = 0; j < boardCols; j++) {
         newRow.push([asset]);
         newFlipRow.push([assetFlipStatus]);
         newRotateRow.push([assetRotateStatus]);
         newLargeRow.push(null);
+        newLightRow.push(false);
       }
       board.push(newRow);
       flipAssetIndicator.push(newFlipRow);
       rotateAssetIndicator.push(newRotateRow);
       largeAssetIndicator.push(newLargeRow);
+      lightIndicator.push(newLightRow);
     }
     return {
       board,
       flipAssetIndicator,
       rotateAssetIndicator,
       largeAssetIndicator,
+      lightIndicator,
     };
   }
 
@@ -150,7 +159,9 @@ class App extends React.Component {
       flipAssetIndicator,
       rotateAssetIndicator,
       largeAssetIndicator,
+      lightIndicator,
       eraseMode,
+      lightMode,
     } = this.state;
 
     if (eraseMode) {
@@ -160,6 +171,20 @@ class App extends React.Component {
         board[rowInd][colInd].pop();
         flipAssetIndicator[rowInd][colInd].pop();
         rotateAssetIndicator[rowInd][colInd].pop();
+        // Erase light source if it previously had light
+        lightIndicator[rowInd][colInd] = false;
+      }
+    } else if (lightMode) {
+      /************** LIGHT MODE **************/
+      // Add light if square has an overlay asset (need to attach light source to an object)
+      if (board[rowInd][colInd].length !== 1) {
+        // If square is part of large asset, change light indicator for top-left corner of asset
+        const largeAsset = largeAssetIndicator[rowInd][colInd];
+        if (largeAsset) {
+          rowInd = rowInd - largeAsset[2];
+          colInd = colInd - largeAsset[3];
+        }
+        lightIndicator[rowInd][colInd] = !lightIndicator[rowInd][colInd];
       }
     } else {
       /************** DRAWING MODE **************/
@@ -209,10 +234,16 @@ class App extends React.Component {
 
   // Helper to render game board's individual rows
   renderGameRow(row, rowInd) {
-    const { flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = this.state;
+    const {
+      flipAssetIndicator,
+      rotateAssetIndicator,
+      largeAssetIndicator,
+      lightIndicator,
+    } = this.state;
 
     return row.map((path, colInd) => {
       const largeAsset = largeAssetIndicator[rowInd][colInd];
+      const hasLight = lightIndicator[rowInd][colInd];
 
       // Background tile only
       if (path.length === 1) {
@@ -230,11 +261,10 @@ class App extends React.Component {
           </div>
         );
       }
-      // Background + overlay
+      // Background + overlay + light source
       return (
         <div className="GameBoard-square">
           <img
-            className="image1"
             row={rowInd}
             col={colInd}
             src={require(`./assets/${path[0]}`)}
@@ -244,7 +274,6 @@ class App extends React.Component {
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
           <img
-            className="image2"
             row={rowInd}
             col={colInd}
             src={require(`./assets/${path[1]}`)}
@@ -256,6 +285,15 @@ class App extends React.Component {
             }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
+          {hasLight ? (
+            <img
+              className="LightSource"
+              row={rowInd}
+              col={colInd}
+              src={require(`./assets/${LIGHT_SOURCE}`)}
+              onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+            />
+          ) : null}
         </div>
       );
     });
@@ -284,6 +322,7 @@ class App extends React.Component {
       selectedAssetSizeWidth: COMBINED_TILES[path].width,
       selectedAssetSizeHeight: COMBINED_TILES[path].height,
       eraseMode: false,
+      lightMode: false,
     });
   }
 
@@ -345,6 +384,7 @@ class App extends React.Component {
 
   resetBoard() {
     const { selectedAsset, selectedAssetFlipStatus, selectedAssetRotateStatus } = this.state;
+    this.setState({ lightMode: false, eraseMode: false });
     this.setState(
       this.initializeGameBoards(selectedAsset, selectedAssetFlipStatus, selectedAssetRotateStatus)
     );
@@ -372,8 +412,9 @@ class App extends React.Component {
 
   hotKeyHandlers = {
     HOTKEY_ROTATE: () => this.rotateAsset(),
-    HOTKEY_ERASE: () => this.setState({ eraseMode: !this.state.eraseMode }),
+    HOTKEY_ERASE: () => this.setState({ eraseMode: !this.state.eraseMode, lightMode: false }),
     HOTKEY_FLIP: () => this.flipAsset(),
+    HOTKEY_LIGHT: () => this.setState({ lightMode: !this.state.lightMode, eraseMode: false }),
   };
 
   /****************************************************************
@@ -411,6 +452,7 @@ class App extends React.Component {
         flipAssetIndicator: newLevel.flipAssetIndicator,
         rotateAssetIndicator: newLevel.rotateAssetIndicator,
         largeAssetIndicator: newLevel.largeAssetIndicator,
+        lightIndicator: newLevel.lightIndicator,
       });
     }
   }
@@ -441,6 +483,7 @@ class App extends React.Component {
       assetBoardItem,
       fileName,
       eraseMode,
+      lightMode,
     } = this.state;
 
     return (
@@ -508,15 +551,23 @@ class App extends React.Component {
                 <Button outline color="info" type="button" onClick={() => this.flipAsset()}>
                   Flip
                 </Button>{' '}
+                <Button
+                  color={eraseMode ? 'warning' : 'outline-warning'}
+                  type="button"
+                  onClick={() => this.setState({ eraseMode: !eraseMode, lightMode: false })}
+                >
+                  Eraser
+                </Button>
+                <br />
                 <Button outline color="primary" type="button" onClick={() => this.rotateAsset()}>
                   Rotate
                 </Button>{' '}
                 <Button
-                  color={eraseMode ? 'warning' : 'outline-warning'}
+                  color={lightMode ? 'success' : 'outline-success'}
                   type="button"
-                  onClick={() => this.setState({ eraseMode: !eraseMode })}
+                  onClick={() => this.setState({ lightMode: !lightMode, eraseMode: false })}
                 >
-                  Eraser
+                  Light
                 </Button>
               </div>
               <div className="ResetButton">

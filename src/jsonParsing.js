@@ -21,6 +21,7 @@ function stateToJson(state) {
     flipAssetIndicator,
     rotateAssetIndicator,
     largeAssetIndicator,
+    lightIndicator,
   } = state;
   largeAssetIndicatorGlobal = largeAssetIndicator;
 
@@ -64,6 +65,9 @@ function stateToJson(state) {
             break;
         }
 
+        // If background tile, default to no light. Else, check for light indicator
+        const light = type === TILE_TYPE.GROUND ? false : lightIndicator[y][x];
+
         // Add to current coordinate array
         currentCoord.push({
           name,
@@ -71,6 +75,7 @@ function stateToJson(state) {
           flip,
           rotate,
           type,
+          light,
         });
       }
       // Finished processing a tile
@@ -89,7 +94,13 @@ function stateToJson(state) {
 async function jsonToState(dataStr, newBoards) {
   try {
     const text = await dataStr.text();
-    const { board, flipAssetIndicator, rotateAssetIndicator, largeAssetIndicator } = newBoards;
+    const {
+      board,
+      flipAssetIndicator,
+      rotateAssetIndicator,
+      largeAssetIndicator,
+      lightIndicator,
+    } = newBoards;
     const { tiles, assets } = JSON.parse(text);
     const { rows, columns } = tiles;
 
@@ -99,7 +110,7 @@ async function jsonToState(dataStr, newBoards) {
         const assetArr = assets[rowInd][colInd];
         // loop through all assets on the x,y coordinate
         for (let ind = 0; ind < assetArr.length; ind++) {
-          const { texture, flip, rotate, type } = assetArr[ind];
+          const { texture, flip, rotate, type, light } = assetArr[ind];
           if (type === TILE_TYPE.GROUND) {
             /*********** Ground Tiles ***********/
             board[rowInd][colInd][0] = texture;
@@ -109,6 +120,7 @@ async function jsonToState(dataStr, newBoards) {
             /*********** Non-ground Tiles ***********/
             const sizeWidth = COMBINED_TILES[texture].width;
             const sizeHeight = COMBINED_TILES[texture].height;
+            lightIndicator[rowInd][colInd] = light; // Update light information
             // Mainly for large assets -> Go through all coordinates that is covered by the asset
             for (let i = 0; i < sizeHeight; i++) {
               for (let j = 0; j < sizeWidth; j++) {
@@ -144,6 +156,7 @@ async function jsonToState(dataStr, newBoards) {
       flipAssetIndicator,
       rotateAssetIndicator,
       largeAssetIndicator,
+      lightIndicator,
     };
   } catch (err) {
     alert(`*** FAILED PARSING FILE ***\n${err}`);
