@@ -57,7 +57,8 @@ function stateToJson(state) {
         const { type } = COMBINED_TILES[path];
         let name;
         switch (type) {
-          case TILE_TYPE.TEAM || TILE_TYPE.CHARACTER:
+          case TILE_TYPE.TEAM:
+          case TILE_TYPE.CHARACTER:
             name = COMBINED_TILES[path].team;
             break;
           default:
