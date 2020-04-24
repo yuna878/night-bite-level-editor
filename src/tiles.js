@@ -60,6 +60,24 @@ const BRICK_TILES = {
     height: 1,
     palette: 'Blue',
   },
+  'background/blue/Blue_Brick_Corner_2.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Blue',
+  },
+  'background/blue/Blue_Brick_Corner_3.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Blue',
+  },
+  'background/blue/Blue_Brick_Corner_4.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Blue',
+  },
   'background/purple/Purple_Brick_1.png': {
     type: TILE_TYPE.DECORATION,
     width: 1,
@@ -90,6 +108,24 @@ const BRICK_TILES = {
     height: 1,
     palette: 'Purple',
   },
+  'background/purple/Purple_Brick_Corner_2.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Purple',
+  },
+  'background/purple/Purple_Brick_Corner_3.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Purple',
+  },
+  'background/purple/Purple_Brick_Corner_4.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Purple',
+  },
   'background/red/Red_Brick_1.png': {
     type: TILE_TYPE.DECORATION,
     width: 1,
@@ -115,6 +151,24 @@ const BRICK_TILES = {
     palette: 'Red',
   },
   'background/red/Red_Brick_Corner.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Red',
+  },
+  'background/red/Red_Brick_Corner_2.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Red',
+  },
+  'background/red/Red_Brick_Corner_3.png': {
+    type: TILE_TYPE.DECORATION,
+    width: 1,
+    height: 1,
+    palette: 'Red',
+  },
+  'background/red/Red_Brick_Corner_4.png': {
     type: TILE_TYPE.DECORATION,
     width: 1,
     height: 1,
@@ -339,6 +393,10 @@ const ENVIRONMENT_TILES = {
   'environment/StallItem1_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
   'environment/StallOther1_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
   'environment/StallOther2_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
+  'environment/StallOther3_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
+  'environment/StallOther4_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
+  'environment/StallOther5_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
+  'environment/StallOther5-1_64.png': { type: TILE_TYPE.WALL, width: 2, height: 1 },
   'environment/StallOther_palette2_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
   'environment/StallOtherWide_64.png': { type: TILE_TYPE.WALL, width: 4, height: 2 },
 };

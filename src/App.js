@@ -329,9 +329,9 @@ class App extends React.Component {
   renderAssetBoard(assetBoard, categoryName) {
     const { selectedPalette } = this.state;
     // Filter assets for selected palette
-    if (selectedPalette != 'All') {
+    if (selectedPalette !== 'All') {
       assetBoard = assetBoard.filter((path) =>
-        COMBINED_TILES[path].palette ? COMBINED_TILES[path].palette == selectedPalette : true
+        COMBINED_TILES[path].palette ? COMBINED_TILES[path].palette === selectedPalette : true
       );
     }
     return (
@@ -349,7 +349,7 @@ class App extends React.Component {
               {/* Handle labels */}
               {COMBINED_TILES[path].label ? (
                 <div
-                  id={COMBINED_TILES[path].type == TILE_TYPE.GROUND ? 'light' : null}
+                  id={COMBINED_TILES[path].type === TILE_TYPE.GROUND ? 'light' : null}
                   className="Label"
                   onClick={() => this.handleAssetSquareClick(path)}
                 >
