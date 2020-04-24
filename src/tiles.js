@@ -386,6 +386,8 @@ const HOME_TILES = {
 const ENVIRONMENT_TILES = {
   'environment/Box_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/box_palette2_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
+  'environment/Seat1_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
+  'environment/Seat2_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/DirectionsSign_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/HangingLantern_64.png': { type: TILE_TYPE.DECORATION, width: 1, height: 1 },
   'environment/Shrub_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
