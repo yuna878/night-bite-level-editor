@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable spaced-comment */
-import { COMBINED_TILES, TILE_TYPE } from './tiles';
+import { COMBINED_TILES, TILE_TYPE, ENVIRONMENT_TILES } from './tiles';
 
 let largeAssetIndicatorGlobal;
 
@@ -73,7 +73,7 @@ function stateToJson(state) {
     const newRow = [];
     for (let x = 0; x < boardCols; x++) {
       const currentCoord = [];
-      const { background, decoration, object } = board[y][x];
+      const { background, brick, lantern, object } = board[y][x];
       let light = lightIndicator[y][x];
 
       /*********** Overlay ***********/
@@ -85,9 +85,13 @@ function stateToJson(state) {
           light = false; // Avoid double processing of light for object & decoration
         }
       }
-      /*********** Decoration ***********/
-      if (decoration) {
-        currentCoord.unshift(processTileInfo(decoration, light, x, y));
+      /*********** Lantern ***********/
+      if (lantern) {
+        currentCoord.unshift(processTileInfo(lantern, light, x, y));
+      }
+      /*********** Brick ***********/
+      if (brick) {
+        currentCoord.unshift(processTileInfo(brick, false, x, y)); // Always no light
       }
       /*********** Background ***********/
       currentCoord.unshift(processTileInfo(background, false, x, y)); // Always no light
@@ -133,9 +137,12 @@ async function jsonToState(dataStr, newBoards) {
           if (type === TILE_TYPE.GROUND) {
             /*********** Background ***********/
             board[rowInd][colInd].background = tileInfo;
+          } else if (type === TILE_TYPE.DECORATION && !ENVIRONMENT_TILES.hasOwnProperty(texture)) {
+            /*********** Brick ***********/
+            board[rowInd][colInd].brick = tileInfo;
           } else if (type === TILE_TYPE.DECORATION) {
-            /*********** Decoration ***********/
-            board[rowInd][colInd].decoration = tileInfo;
+            /*********** Lantern ***********/
+            board[rowInd][colInd].lantern = tileInfo;
             lightIndicator[rowInd][colInd] = lightIndicator[rowInd][colInd] || light; // Update light information
           } else {
             /*********** Overlay ***********/
