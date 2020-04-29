@@ -25,12 +25,20 @@ function stateToJson(state) {
   } = state;
   largeAssetIndicatorGlobal = largeAssetIndicator;
 
+  /**** Reverse board : level editor coordinates -> game coordinates ****/
+  board.reverse();
+  flipAssetIndicator.reverse();
+  rotateAssetIndicator.reverse();
+  largeAssetIndicator.reverse();
+  lightIndicator.reverse();
+
   /**** Board information ****/
   const tiles = {
     height: 64,
     width: 64,
     rows: boardRows,
     columns: boardCols,
+    coordinateAdjusted: true,
   };
 
   /**** Loop through each tile and generate 3d array of asset information ****/
@@ -104,6 +112,11 @@ async function jsonToState(dataStr, newBoards) {
     } = newBoards;
     const { tiles, assets } = JSON.parse(text);
     const { rows, columns } = tiles;
+
+    if (tiles.hasOwnProperty('coordinateAdjusted')) {
+      /**** Reverse board : game coordinates -> level editor coordinates ****/
+      assets.reverse();
+    }
 
     // loop through each coordinate
     for (let rowInd = 0; rowInd < rows; rowInd++) {

@@ -13,6 +13,7 @@ import {
   HOLE_BACKGROUND_TILES,
   HOLE_EDGE_TILES,
   CHARACTER_TILES,
+  ENEMY_TILES,
   HOME_TILES,
   ENVIRONMENT_TILES,
   ITEM_TILES,
@@ -58,6 +59,7 @@ class App extends React.Component {
       assetBoardHoleBackground: [],
       assetBoardHoleEdge: [],
       assetBoardCharacter: [],
+      assetBoardEnemy: [],
       assetBoardHome: [],
       assetBoardEnvironment: [],
       assetBoardItem: [],
@@ -83,6 +85,7 @@ class App extends React.Component {
     let assetBoardHoleBackground = this.initializeAsset(HOLE_BACKGROUND_TILES);
     let assetBoardHoleEdge = this.initializeAsset(HOLE_EDGE_TILES);
     let assetBoardCharacter = this.initializeAsset(CHARACTER_TILES);
+    let assetBoardEnemy = this.initializeAsset(ENEMY_TILES);
     let assetBoardHome = this.initializeAsset(HOME_TILES);
     let assetBoardEnvironment = this.initializeAsset(ENVIRONMENT_TILES);
     let assetBoardItem = this.initializeAsset(ITEM_TILES);
@@ -92,6 +95,7 @@ class App extends React.Component {
       assetBoardHoleBackground,
       assetBoardHoleEdge,
       assetBoardCharacter,
+      assetBoardEnemy,
       assetBoardHome,
       assetBoardEnvironment,
       assetBoardItem,
@@ -396,7 +400,7 @@ class App extends React.Component {
 
   rotateAsset() {
     let { selectedAssetRotateStatus } = this.state;
-    selectedAssetRotateStatus += 90 % 360; // Rotate 90 degrees clockwise
+    selectedAssetRotateStatus = (selectedAssetRotateStatus + 90) % 360; // Rotate 90 degrees clockwise
     this.setState({ selectedAssetRotateStatus });
   }
 
@@ -477,6 +481,7 @@ class App extends React.Component {
       assetBoardHoleBackground,
       assetBoardHoleEdge,
       assetBoardCharacter,
+      assetBoardEnemy,
       assetBoardHome,
       assetBoardEnvironment,
       assetBoardItem,
@@ -539,6 +544,7 @@ class App extends React.Component {
                   {this.renderAssetBoard(assetBoardItem, 'Item')}
                   {this.renderAssetBoard(assetBoardCharacter, 'Character')}
                   {this.renderAssetBoard(assetBoardHome, 'Home')}
+                  {this.renderAssetBoard(assetBoardEnemy, 'Enemy')}
                   {this.renderAssetBoard(assetBoardEnvironment, 'Environment')}
                 </div>
               </div>

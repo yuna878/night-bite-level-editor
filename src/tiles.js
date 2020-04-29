@@ -5,6 +5,7 @@ const TILE_TYPE = {
   TEAM: 'team',
   ITEM: 'item',
   CHARACTER: 'character',
+  ENEMY: 'enemy',
   DECORATION: 'decoration',
 };
 
@@ -356,6 +357,12 @@ const CHARACTER_TILES = {
   },
 };
 
+const ENEMY_TILES = {
+  'character/enemy/E1_64.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
+  'character/enemy/E2_64.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
+  'character/enemy/E3_64_v2.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
+};
+
 const HOME_TILES = {
   'environment/StallHome1_64.png': {
     type: TILE_TYPE.TEAM,
@@ -384,6 +391,7 @@ const HOME_TILES = {
 };
 
 const ENVIRONMENT_TILES = {
+  'environment/Barrier_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/Box_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/box_palette2_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
   'environment/Seat1-1_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
@@ -415,6 +423,7 @@ Object.assign(
   HOLE_BACKGROUND_TILES,
   HOLE_EDGE_TILES,
   CHARACTER_TILES,
+  ENEMY_TILES,
   HOME_TILES,
   ENVIRONMENT_TILES,
   ITEM_TILES
@@ -426,6 +435,7 @@ export {
   HOLE_BACKGROUND_TILES,
   HOLE_EDGE_TILES,
   CHARACTER_TILES,
+  ENEMY_TILES,
   HOME_TILES,
   ENVIRONMENT_TILES,
   ITEM_TILES,
