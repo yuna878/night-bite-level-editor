@@ -26,6 +26,7 @@ const ASSETBOARD_COLS = 4;
 const GAMESQUARE_SIZE = 50; // From CSS .GameBoard-square size (in px)
 const DEFAULT_SELECTED_ASSET = 'background/blue/Blue_Texture.png';
 const DEFAULT_SELECTED_ASSET_IS_BACKGROUND = true;
+const DEFAULT_SELECTED_ASSET_IS_DECORATION = false;
 const DEFAULT_SELECTED_ASSET_FLIP_STATUS = 1;
 const DEFAULT_SELECTED_ASSET_ROTATE_STATUS = 0;
 const DEFAULT_SELECTED_ASSET_SIZE_RATIO = 1;
@@ -43,13 +44,17 @@ class App extends React.Component {
     this.state = {
       boardRows: 12,
       boardCols: 20,
-      board: [], // 3d array : row x column x array of strings of path to asset
-      flipAssetIndicator: [], // 3d array : row x column x array of ints indicating flip status
-      rotateAssetIndicator: [], // 3d array : row x column x array of ints indicating degree of rotation
-      largeAssetIndicator: [], // 2d array where each element is null or [width, height, x_coord relative to image, y_coord relative to image]
-      lightIndicator: [], // 2d array where each element is a boolean indicating whether asset needs a light source (for large asset, only indicated for top-left position)
+      /** BOARD: 2d array of { background, decoration, object }
+       *  Each element maps to null or { texture, flip, rotate, largeAsset }
+       *  texture : string of path to texture
+       *  flip : int indicating flip status (1: normal ; -1: flipped horizontally)
+       *  rotate : ints indicating degree of rotation */
+      board: [],
+      largeAssetIndicator: [], // 2d array where each element is null or [width, height, x_coord relative to image, y_coord relative to image] (only applies for 'object' asset)
+      lightIndicator: [], // 2d array where each element is a boolean indicating whether topmost asset needs a light source (for large asset, only indicated for top-left position)
       selectedAsset: DEFAULT_SELECTED_ASSET,
       selectedAssetIsBackground: DEFAULT_SELECTED_ASSET_IS_BACKGROUND,
+      selectedAssetIsDecoration: DEFAULT_SELECTED_ASSET_IS_DECORATION,
       selectedAssetFlipStatus: DEFAULT_SELECTED_ASSET_FLIP_STATUS, // 1: normal ; -1: flipped horizontally
       selectedAssetRotateStatus: DEFAULT_SELECTED_ASSET_ROTATE_STATUS, // Degrees
       selectedAssetSizeWidth: DEFAULT_SELECTED_ASSET_SIZE_RATIO,
@@ -110,34 +115,30 @@ class App extends React.Component {
   // Initialize all asset boards with given values
   initializeGameBoards(asset, assetFlipStatus, assetRotateStatus) {
     const { boardRows, boardCols } = this.state;
+    const background = {
+      texture: asset,
+      flip: assetFlipStatus,
+      rotate: assetRotateStatus,
+    };
+
     let board = [];
-    let flipAssetIndicator = [];
-    let rotateAssetIndicator = [];
     let largeAssetIndicator = [];
     let lightIndicator = [];
     for (let i = 0; i < boardRows; i++) {
       let newRow = [];
-      let newFlipRow = [];
-      let newRotateRow = [];
       let newLargeRow = [];
       let newLightRow = [];
       for (let j = 0; j < boardCols; j++) {
-        newRow.push([asset]);
-        newFlipRow.push([assetFlipStatus]);
-        newRotateRow.push([assetRotateStatus]);
+        newRow.push({ background, decoration: null, object: null });
         newLargeRow.push(null);
         newLightRow.push(false);
       }
       board.push(newRow);
-      flipAssetIndicator.push(newFlipRow);
-      rotateAssetIndicator.push(newRotateRow);
       largeAssetIndicator.push(newLargeRow);
       lightIndicator.push(newLightRow);
     }
     return {
       board,
-      flipAssetIndicator,
-      rotateAssetIndicator,
       largeAssetIndicator,
       lightIndicator,
     };
@@ -155,32 +156,35 @@ class App extends React.Component {
       boardCols,
       selectedAsset,
       selectedAssetIsBackground,
+      selectedAssetIsDecoration,
       selectedAssetFlipStatus,
       selectedAssetRotateStatus,
       selectedAssetSizeWidth,
       selectedAssetSizeHeight,
-      flipAssetIndicator,
-      rotateAssetIndicator,
       largeAssetIndicator,
       lightIndicator,
       eraseMode,
       lightMode,
     } = this.state;
 
+    let tileInfo = board[rowInd][colInd];
+
     if (eraseMode) {
       /************** ERASER MODE **************/
-      // Erase overlay assets ; Don't erase background
-      if (board[rowInd][colInd].length !== 1) {
-        board[rowInd][colInd].pop();
-        flipAssetIndicator[rowInd][colInd].pop();
-        rotateAssetIndicator[rowInd][colInd].pop();
-        // Erase light source if it previously had light
+      // Erase top-most layer of asset; Don't erase background
+      if (tileInfo.object) {
+        tileInfo.object = null; // TODO: empty large asset indicator
+      } else if (tileInfo.decoration) {
+        tileInfo.decoration = null;
+      }
+      // Erase light source if only background is left
+      if (!tileInfo.object && !tileInfo.decoration) {
         lightIndicator[rowInd][colInd] = false;
       }
     } else if (lightMode) {
       /************** LIGHT MODE **************/
       // Add light if square has an overlay asset (need to attach light source to an object)
-      if (board[rowInd][colInd].length !== 1) {
+      if (tileInfo.object) {
         // If square is part of large asset, change light indicator for top-left corner of asset
         const largeAsset = largeAssetIndicator[rowInd][colInd];
         if (largeAsset) {
@@ -188,32 +192,33 @@ class App extends React.Component {
           colInd = colInd - largeAsset[3];
         }
         lightIndicator[rowInd][colInd] = !lightIndicator[rowInd][colInd];
+      } else if (tileInfo.decoration) {
+        lightIndicator[rowInd][colInd] = !lightIndicator[rowInd][colInd];
       }
     } else {
       /************** DRAWING MODE **************/
+      const updateInfo = {
+        texture: selectedAsset,
+        flip: selectedAssetFlipStatus,
+        rotate: selectedAssetRotateStatus,
+      };
+
       // Mainly for large assets -> Go through all coordinates that is covered by the asset
       for (let i = 0; i < selectedAssetSizeHeight; i++) {
         for (let j = 0; j < selectedAssetSizeWidth; j++) {
           let x = rowInd + i;
           let y = colInd + j;
+          let currentTileInfo = board[x][y];
+
           // Check new coordinate is in bounds of board
           if (x < boardRows && y < boardCols) {
-            // Update boards depending on whether selected asset is a background tile
+            // Update boards depending on tile type
             if (selectedAssetIsBackground) {
-              board[x][y][0] = selectedAsset;
-              flipAssetIndicator[x][y][0] = selectedAssetFlipStatus;
-              rotateAssetIndicator[x][y][0] = selectedAssetRotateStatus;
+              currentTileInfo.background = updateInfo;
+            } else if (selectedAssetIsDecoration) {
+              currentTileInfo.decoration = updateInfo;
             } else {
-              // Clear out existing info, if any
-              if (board[x][y].length !== 1) {
-                board[x][y].pop();
-                flipAssetIndicator[x][y].pop();
-                rotateAssetIndicator[x][y].pop();
-              }
-              // Update all information
-              board[x][y].push(selectedAsset);
-              flipAssetIndicator[x][y].push(selectedAssetFlipStatus);
-              rotateAssetIndicator[x][y].push(selectedAssetRotateStatus);
+              currentTileInfo.object = updateInfo;
               largeAssetIndicator[x][y] = [selectedAssetSizeWidth, selectedAssetSizeHeight, i, j];
             }
           }
@@ -222,9 +227,8 @@ class App extends React.Component {
     }
     this.setState({
       board,
-      flipAssetIndicator,
-      rotateAssetIndicator,
       largeAssetIndicator,
+      lightIndicator,
     });
   }
 
@@ -244,50 +248,47 @@ class App extends React.Component {
       lightIndicator,
     } = this.state;
 
-    return row.map((path, colInd) => {
+    return row.map((tileInfo, colInd) => {
+      const { background, decoration, object } = tileInfo;
       const largeAsset = largeAssetIndicator[rowInd][colInd];
       const hasLight = lightIndicator[rowInd][colInd];
 
-      // Background tile only
-      if (path.length === 1) {
-        return (
-          <div className="GameBoard-square">
-            <img
-              row={rowInd}
-              col={colInd}
-              src={require(`./assets/${path[0]}`)}
-              style={{
-                transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]}deg)`,
-              }}
-              onClick={() => this.handleGameSquareClick(rowInd, colInd)}
-            />
-          </div>
-        );
-      }
-      // Background + overlay + light source
       return (
         <div className="GameBoard-square">
           <img
             row={rowInd}
             col={colInd}
-            src={require(`./assets/${path[0]}`)}
+            src={require(`./assets/${background.texture}`)}
             style={{
-              transform: `scaleX(${flipAssetIndicator[rowInd][colInd][0]}) rotate(${rotateAssetIndicator[rowInd][colInd][0]}deg)`,
+              transform: `scaleX(${background.flip}) rotate(${background.rotate}deg)`,
             }}
             onClick={() => this.handleGameSquareClick(rowInd, colInd)}
           />
-          <img
-            row={rowInd}
-            col={colInd}
-            src={require(`./assets/${path[1]}`)}
-            style={{
-              transform: `scaleX(${flipAssetIndicator[rowInd][colInd][1]}) rotate(${rotateAssetIndicator[rowInd][colInd][1]}deg)`,
-              width: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
-              height: `${largeAsset ? largeAsset[1] * GAMESQUARE_SIZE : null}px`,
-              margin: `${largeAsset ? this.generateMargin(largeAsset) : null}`,
-            }}
-            onClick={() => this.handleGameSquareClick(rowInd, colInd)}
-          />
+          {decoration ? (
+            <img
+              row={rowInd}
+              col={colInd}
+              src={require(`./assets/${decoration.texture}`)}
+              style={{
+                transform: `scaleX(${decoration.flip}) rotate(${decoration.rotate}deg)`,
+              }}
+              onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+            />
+          ) : null}
+          {object ? (
+            <img
+              row={rowInd}
+              col={colInd}
+              src={require(`./assets/${object.texture}`)}
+              style={{
+                transform: `scaleX(${object.flip}) rotate(${object.rotate}deg)`,
+                width: `${largeAsset ? largeAsset[0] * GAMESQUARE_SIZE : null}px`,
+                height: `${largeAsset ? largeAsset[1] * GAMESQUARE_SIZE : null}px`,
+                margin: `${largeAsset ? this.generateMargin(largeAsset) : null}`,
+              }}
+              onClick={() => this.handleGameSquareClick(rowInd, colInd)}
+            />
+          ) : null}
           {hasLight ? (
             <img
               className="LightSource"
@@ -317,9 +318,11 @@ class App extends React.Component {
   // Change selected asset
   handleAssetSquareClick(path) {
     let selectedAssetIsBackground = COMBINED_TILES[path].type === TILE_TYPE.GROUND;
+    let selectedAssetIsDecoration = COMBINED_TILES[path].type === TILE_TYPE.DECORATION;
     this.setState({
       selectedAsset: path,
       selectedAssetIsBackground,
+      selectedAssetIsDecoration,
       selectedAssetFlipStatus: 1,
       selectedAssetRotateStatus: 0,
       selectedAssetSizeWidth: COMBINED_TILES[path].width,
@@ -423,7 +426,7 @@ class App extends React.Component {
   /****************************************************************
    ***************************** JSON *****************************
    ****************************************************************/
-
+  //TODO JSON
   downloadLevelJson() {
     const { fileName } = this.state;
     let download = document.getElementById('downloadLevelJsonLink');
