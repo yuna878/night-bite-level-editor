@@ -39,7 +39,7 @@ Current board size: `20x12`
       "light": false, // indicate need for light source
     }
 
-TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || 'decoration'
+TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || 'enemy' || 'decoration'
 ```
 
 ### Example
