@@ -45,13 +45,13 @@ class App extends React.Component {
       boardRows: 12,
       boardCols: 20,
       /** BOARD: 2d array of { background, decoration, object }
-       *  Each element maps to null or { texture, flip, rotate, largeAsset }
+       *  Each element maps to null or { texture, flip, rotate }
        *  texture : string of path to texture
        *  flip : int indicating flip status (1: normal ; -1: flipped horizontally)
        *  rotate : ints indicating degree of rotation */
       board: [],
       largeAssetIndicator: [], // 2d array where each element is null or [width, height, x_coord relative to image, y_coord relative to image] (only applies for 'object' asset)
-      lightIndicator: [], // 2d array where each element is a boolean indicating whether topmost asset needs a light source (for large asset, only indicated for top-left position)
+      lightIndicator: [], // 2d array where each element is a boolean indicating whether top-most asset needs a light source (for large asset, only indicated for top-left position)
       selectedAsset: DEFAULT_SELECTED_ASSET,
       selectedAssetIsBackground: DEFAULT_SELECTED_ASSET_IS_BACKGROUND,
       selectedAssetIsDecoration: DEFAULT_SELECTED_ASSET_IS_DECORATION,
@@ -173,7 +173,7 @@ class App extends React.Component {
       /************** ERASER MODE **************/
       // Erase top-most layer of asset; Don't erase background
       if (tileInfo.object) {
-        tileInfo.object = null; // TODO: empty large asset indicator
+        tileInfo.object = null;
       } else if (tileInfo.decoration) {
         tileInfo.decoration = null;
       }
@@ -203,22 +203,23 @@ class App extends React.Component {
         rotate: selectedAssetRotateStatus,
       };
 
-      // Mainly for large assets -> Go through all coordinates that is covered by the asset
-      for (let i = 0; i < selectedAssetSizeHeight; i++) {
-        for (let j = 0; j < selectedAssetSizeWidth; j++) {
-          let x = rowInd + i;
-          let y = colInd + j;
-          let currentTileInfo = board[x][y];
-
-          // Check new coordinate is in bounds of board
-          if (x < boardRows && y < boardCols) {
-            // Update boards depending on tile type
-            if (selectedAssetIsBackground) {
-              currentTileInfo.background = updateInfo;
-            } else if (selectedAssetIsDecoration) {
-              currentTileInfo.decoration = updateInfo;
-            } else {
-              currentTileInfo.object = updateInfo;
+      // Update board depending on selected asset type
+      if (selectedAssetIsBackground) {
+        /*********** Background ***********/
+        board[rowInd][colInd].background = updateInfo;
+      } else if (selectedAssetIsDecoration) {
+        /*********** Decoration ***********/
+        board[rowInd][colInd].decoration = updateInfo;
+      } else {
+        /*********** Overlay ***********/
+        // Mainly for large assets -> Go through all coordinates that is covered by the asset
+        for (let i = 0; i < selectedAssetSizeHeight; i++) {
+          for (let j = 0; j < selectedAssetSizeWidth; j++) {
+            let x = rowInd + i;
+            let y = colInd + j;
+            // Check new coordinate is in bounds of board
+            if (x < boardRows && y < boardCols) {
+              board[x][y].object = updateInfo;
               largeAssetIndicator[x][y] = [selectedAssetSizeWidth, selectedAssetSizeHeight, i, j];
             }
           }
@@ -426,7 +427,6 @@ class App extends React.Component {
   /****************************************************************
    ***************************** JSON *****************************
    ****************************************************************/
-  //TODO JSON
   downloadLevelJson() {
     const { fileName } = this.state;
     let download = document.getElementById('downloadLevelJsonLink');
@@ -455,8 +455,6 @@ class App extends React.Component {
     if (newLevel) {
       this.setState({
         board: newLevel.board,
-        flipAssetIndicator: newLevel.flipAssetIndicator,
-        rotateAssetIndicator: newLevel.rotateAssetIndicator,
         largeAssetIndicator: newLevel.largeAssetIndicator,
         lightIndicator: newLevel.lightIndicator,
       });
