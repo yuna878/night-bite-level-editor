@@ -21,6 +21,7 @@ Current board size: `20x12`
     "width": 64, // pixel width of a tile
     "rows": 12, // tile height of game board
     "columns": 20 // tile width of game board
+    coordinateAdjusted: true // indicate if coordinate flipping was handled
   },
   "assets" : [ // 3d array of row x column x elements array
     [
@@ -37,6 +38,7 @@ Current board size: `20x12`
       "rotate": 0, // number of clockwise 90 degree rotations from the original
       "type": "typeOfAsset", // one of TILE_TYPE listed below
       "light": false, // indicate need for light source
+      "enemyType": null || "enemy_type // if type=='enemy', give enemy type
     }
 
 TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || 'enemy' || 'decoration'
@@ -56,7 +58,8 @@ TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || '
           "flip": false,
           "rotate": 0,
           "type": "ground",
-          "light": false
+          "light": false,
+          "enemyType": null
         },
         {
           "name": "teamA",
@@ -64,7 +67,8 @@ TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || '
           "flip": false,
           "rotate": 0,
           "type": "character",
-          "light": true
+          "light": true,
+          "enemyType": null
         }
       ],
       [
@@ -74,7 +78,17 @@ TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || '
           "flip": false,
           "rotate": 0,
           "type": "ground",
-          "light": false
+          "light": false,
+          "enemyType": null
+        },
+        {
+          "name": "enemy_8_8",
+          "texture": "character/enemy/E2_64.png",
+          "flip": false,
+          "rotate": 0,
+          "type": "enemy",
+          "light": false,
+          "enemyType": "OilEnemy"
         }
       ]
     ]

@@ -77,6 +77,9 @@ function stateToJson(state) {
         // If background tile, default to no light. Else, check for light indicator
         const light = type === TILE_TYPE.GROUND ? false : lightIndicator[y][x];
 
+        // If enemy, set enemy type
+        const enemyType = type === TILE_TYPE.ENEMY ? COMBINED_TILES[path].enemyType : null;
+
         // Add to current coordinate array
         currentCoord.push({
           name,
@@ -85,6 +88,7 @@ function stateToJson(state) {
           rotate,
           type,
           light,
+          enemyType,
         });
       }
       // Finished processing a tile

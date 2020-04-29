@@ -358,9 +358,24 @@ const CHARACTER_TILES = {
 };
 
 const ENEMY_TILES = {
-  'character/enemy/E1_64.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
-  'character/enemy/E2_64.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
-  'character/enemy/E3_64_v2.png': { type: TILE_TYPE.ENEMY, width: 1, height: 1 },
+  'character/enemy/E1_64.png': {
+    type: TILE_TYPE.ENEMY,
+    width: 1,
+    height: 1,
+    enemyType: 'FireEnemy',
+  },
+  'character/enemy/E2_64.png': {
+    type: TILE_TYPE.ENEMY,
+    width: 1,
+    height: 1,
+    enemyType: 'OilEnemy',
+  },
+  'character/enemy/E3_64_v2.png': {
+    type: TILE_TYPE.ENEMY,
+    width: 1,
+    height: 1,
+    enemyType: 'ThiefEnemy',
+  },
 };
 
 const HOME_TILES = {
