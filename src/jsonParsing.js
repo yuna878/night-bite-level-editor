@@ -48,13 +48,14 @@ function processTileInfo(tile, light, x, y) {
 }
 
 function stateToJson(state) {
-  const { boardRows, boardCols, board, largeAssetIndicator, lightIndicator } = state;
-  largeAssetIndicatorGlobal = largeAssetIndicator;
+  let { boardRows, boardCols, board, largeAssetIndicator, lightIndicator } = state;
 
   /**** Reverse board : level editor coordinates -> game coordinates ****/
-  board.reverse();
-  largeAssetIndicator.reverse();
-  lightIndicator.reverse();
+  board = [...board].reverse();
+  largeAssetIndicator = [...largeAssetIndicator].reverse();
+  lightIndicator = [...lightIndicator].reverse();
+
+  largeAssetIndicatorGlobal = largeAssetIndicator;
 
   /**** Board information ****/
   const tiles = {
