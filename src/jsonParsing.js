@@ -131,7 +131,7 @@ async function jsonToState(dataStr, newBoards) {
           // process information
           let { texture, flip, rotate, type, light } = assetArr[ind];
           flip = flip ? -1 : 1; // boolean to flip
-          rotate *= 90; //  number of 90deg turns to total degree of rotation
+          rotate = (rotate * 90) % 360; //  number of 90deg turns to total degree of rotation
           const tileInfo = { texture, flip, rotate };
 
           // Update board depending on tile type
