@@ -423,7 +423,7 @@ const ENVIRONMENT_TILES = {
   'environment/StallOther5_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
   'environment/StallOther5-1_64.png': { type: TILE_TYPE.WALL, width: 2, height: 1 },
   'environment/StallOther_palette2_64.png': { type: TILE_TYPE.WALL, width: 2, height: 2 },
-  'environment/StallOtherWide_64.png': { type: TILE_TYPE.WALL, width: 4, height: 2 },
+  'environment/StallOtherWide_64.png': { type: TILE_TYPE.WALL, width: 3, height: 2 },
 };
 
 const ITEM_TILES = {
