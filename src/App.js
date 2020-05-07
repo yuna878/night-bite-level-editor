@@ -330,11 +330,11 @@ class App extends React.Component {
 
   // Change selected asset
   handleAssetSquareClick(path) {
-    let selectedAssetIsBackground = COMBINED_TILES[path].type === TILE_TYPE.GROUND;
+    const type = COMBINED_TILES[path].type;
+    let selectedAssetIsBackground = type === TILE_TYPE.GROUND || type === TILE_TYPE.HOLE;
     let selectedAssetIsLantern =
-      COMBINED_TILES[path].type === TILE_TYPE.DECORATION && ENVIRONMENT_TILES.hasOwnProperty(path);
-    let selectedAssetIsBrick =
-      COMBINED_TILES[path].type === TILE_TYPE.DECORATION && !selectedAssetIsLantern;
+      type === TILE_TYPE.DECORATION && ENVIRONMENT_TILES.hasOwnProperty(path);
+    let selectedAssetIsBrick = type === TILE_TYPE.DECORATION && BRICK_TILES.hasOwnProperty(path);
     this.setState({
       selectedAsset: path,
       selectedAssetIsBackground,
@@ -373,7 +373,7 @@ class App extends React.Component {
               {/* Handle labels */}
               {COMBINED_TILES[path].label ? (
                 <div
-                  id={COMBINED_TILES[path].type === TILE_TYPE.GROUND ? 'light' : null}
+                  id={COMBINED_TILES[path].type === TILE_TYPE.HOLE ? 'light' : null}
                   className="Label"
                   onClick={() => this.handleAssetSquareClick(path)}
                 >

@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable spaced-comment */
-import { COMBINED_TILES, TILE_TYPE, ENVIRONMENT_TILES } from './tiles';
+import { COMBINED_TILES, TILE_TYPE, ENVIRONMENT_TILES, BRICK_TILES } from './tiles';
 
 let largeAssetIndicatorGlobal;
 
@@ -129,19 +129,21 @@ async function jsonToState(dataStr, newBoards) {
         // loop through all assets on the x,y coordinate
         for (let ind = 0; ind < assetArr.length; ind++) {
           // process information
-          let { texture, flip, rotate, type, light } = assetArr[ind];
+          let { texture, flip, rotate, light } = assetArr[ind];
+          const { type } = COMBINED_TILES[texture];
+
           flip = flip ? -1 : 1; // boolean to flip
           rotate = (rotate * 90) % 360; //  number of 90deg turns to total degree of rotation
           const tileInfo = { texture, flip, rotate };
 
           // Update board depending on tile type
-          if (type === TILE_TYPE.GROUND) {
+          if (type === TILE_TYPE.GROUND || type === TILE_TYPE.HOLE) {
             /*********** Background ***********/
             board[rowInd][colInd].background = tileInfo;
-          } else if (type === TILE_TYPE.DECORATION && !ENVIRONMENT_TILES.hasOwnProperty(texture)) {
+          } else if (type === TILE_TYPE.DECORATION && BRICK_TILES.hasOwnProperty(texture)) {
             /*********** Brick ***********/
             board[rowInd][colInd].brick = tileInfo;
-          } else if (type === TILE_TYPE.DECORATION) {
+          } else if (type === TILE_TYPE.DECORATION && ENVIRONMENT_TILES.hasOwnProperty(texture)) {
             /*********** Lantern ***********/
             board[rowInd][colInd].lantern = tileInfo;
             lightIndicator[rowInd][colInd] = lightIndicator[rowInd][colInd] || light; // Update light information
