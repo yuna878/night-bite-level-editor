@@ -31,15 +31,15 @@ Current board size: `20x12`
 }
 
 // All elements follow the same format:
-    {
-      "name": "type_x_y || teamName",
-      "texture": "pathToAsset",
-      "flip": false, // horizontal flip
-      "rotate": 0, // number of clockwise 90 degree rotations from the original
-      "type": "typeOfAsset", // one of TILE_TYPE listed below
-      "light": false, // indicate need for light source
-      "enemyType": null || "enemy_type // if type=='enemy', give enemy type
-    }
+{
+  "name": "type_x_y || teamName",
+  "texture": "pathToAsset",
+  "flip": false, // horizontal flip
+  "rotate": 0, // number of clockwise 90 degree rotations from the original
+  "type": "typeOfAsset", // one of TILE_TYPE listed below
+  "light": false, // indicate need for light source
+  "enemyType": null || "enemy_type" // if type=='enemy', give enemy type
+}
 
 TILE_TYPE = 'ground' || 'wall' || 'hole' || 'team' || 'item' || 'character' || 'enemy' || 'decoration'
 ```
