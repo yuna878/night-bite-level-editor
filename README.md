@@ -21,7 +21,7 @@ Current board size: `20x12`
     "width": 64, // pixel width of a tile
     "rows": 12, // tile height of game board
     "columns": 20 // tile width of game board
-    coordinateAdjusted: true // indicate if coordinate flipping was handled
+    "coordinateAdjusted": true // indicate if coordinate flipping was handled
   },
   "assets" : [ // 3d array of row x column x elements array
     [
