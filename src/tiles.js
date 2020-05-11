@@ -376,6 +376,12 @@ const ENEMY_TILES = {
     height: 1,
     enemyType: 'ThiefEnemy',
   },
+  'character/enemy/NPC4_64.png': {
+    type: TILE_TYPE.ENEMY,
+    width: 1,
+    height: 1,
+    enemyType: 'Crowd',
+  },
 };
 
 const HOME_TILES = {
