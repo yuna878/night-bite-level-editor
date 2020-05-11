@@ -16,7 +16,19 @@ const GROUND_TILES = {
     height: 1,
     palette: 'Blue',
   },
+  'background/blue/Blue_Texture_2.png': {
+    type: TILE_TYPE.GROUND,
+    width: 1,
+    height: 1,
+    palette: 'Purple',
+  },
   'background/purple/Purple_Texture.png': {
+    type: TILE_TYPE.GROUND,
+    width: 1,
+    height: 1,
+    palette: 'Purple',
+  },
+  'background/purple/Purple_Texture_2.png': {
     type: TILE_TYPE.GROUND,
     width: 1,
     height: 1,
@@ -28,6 +40,13 @@ const GROUND_TILES = {
     height: 1,
     palette: 'Red',
   },
+  'background/red/Red_Texture_2.png': {
+    type: TILE_TYPE.GROUND,
+    width: 1,
+    height: 1,
+    palette: 'Red',
+  },
+
 };
 
 const BRICK_TILES = {
