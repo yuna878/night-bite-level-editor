@@ -48,7 +48,7 @@ function processTileInfo(tile, light, x, y) {
 }
 
 function stateToJson(state) {
-  let { boardRows, boardCols, board, largeAssetIndicator, lightIndicator } = state;
+  let { boardRows, boardCols, board, largeAssetIndicator, lightIndicator, timeLimit } = state;
 
   /**** Reverse board : level editor coordinates -> game coordinates ****/
   board = [...board].reverse();
@@ -105,6 +105,7 @@ function stateToJson(state) {
   }
 
   return {
+    timeLimit: timeLimit || 120,
     tiles,
     assets,
   };
@@ -114,7 +115,7 @@ async function jsonToState(dataStr, newBoards) {
   try {
     const text = await dataStr.text();
     const { board, largeAssetIndicator, lightIndicator } = newBoards;
-    const { tiles, assets } = JSON.parse(text);
+    const { timeLimit, tiles, assets } = JSON.parse(text);
     const { rows, columns } = tiles;
 
     /**** Reverse board : game coordinates -> level editor coordinates ****/
@@ -177,6 +178,7 @@ async function jsonToState(dataStr, newBoards) {
       board,
       largeAssetIndicator,
       lightIndicator,
+      timeLimit,
     };
   } catch (err) {
     alert(`*** FAILED PARSING FILE ***\n${err}`);

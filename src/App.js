@@ -69,12 +69,14 @@ class App extends React.Component {
       assetBoardEnvironment: [],
       assetBoardItem: [],
       fileName: null, // file name for saving level json
+      timeLimit: null, // time limit for lose condition of level
       eraseMode: false,
       lightMode: false,
       selectedPalette: 'All', // selected color palette for assets
     };
 
-    this.handleFileNamechange = this.handleFileNamechange.bind(this);
+    this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleTimeLimitChange = this.handleTimeLimitChange.bind(this);
   }
 
   /****************************************************************
@@ -429,8 +431,13 @@ class App extends React.Component {
   }
 
   // Input field for download file name
-  handleFileNamechange(event) {
+  handleFileNameChange(event) {
     this.setState({ fileName: event.target.value });
+  }
+
+  // Input field for level time limit
+  handleTimeLimitChange(event) {
+    this.setState({ timeLimit: event.target.value });
   }
 
   hotKeyHandlers = {
@@ -473,6 +480,8 @@ class App extends React.Component {
         board: newLevel.board,
         largeAssetIndicator: newLevel.largeAssetIndicator,
         lightIndicator: newLevel.lightIndicator,
+        fileName: json.name.split('.json', 1),
+        timeLimit: newLevel.timeLimit || 120,
       });
     }
   }
@@ -503,6 +512,7 @@ class App extends React.Component {
       assetBoardEnvironment,
       assetBoardItem,
       fileName,
+      timeLimit,
       eraseMode,
       lightMode,
     } = this.state;
@@ -518,9 +528,17 @@ class App extends React.Component {
                 <text>Export Level: </text>
                 <input
                   type="text"
+                  style={{ width: '350px' }}
                   placeholder="Enter file name...(Default: level)"
                   value={fileName}
-                  onChange={this.handleFileNamechange}
+                  onChange={this.handleFileNameChange}
+                />
+                <input
+                  type="text"
+                  style={{ width: '200px' }}
+                  placeholder="Time (Default: 120)"
+                  value={timeLimit}
+                  onChange={this.handleTimeLimitChange}
                 />
                 <button onClick={() => this.downloadLevelJson()}>Save Level</button>
                 <a id="downloadLevelJsonLink" />
