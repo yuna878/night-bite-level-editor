@@ -452,7 +452,7 @@ const ENVIRONMENT_TILES = {
 
 const ITEM_TILES = {
   'item/food1_64.png': { type: TILE_TYPE.ITEM, width: 1, height: 1 },
-  'environment/Crate2_64.png': { type: TILE_TYPE.DECORATION, width: 1, height: 1 },
+  'environment/Crate2_64.png': { type: TILE_TYPE.WALL, width: 1, height: 1 },
 };
 
 const COMBINED_TILES = {};
